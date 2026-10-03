@@ -143,7 +143,7 @@ export class AegisAIAssistant {
           `*Simulated Autonomous Recommendation — Ready for autonomous execution or operator override.*`;
         recAction = topH.recommendedAction;
       } else {
-        replyText = `🧭 **NOMINAL MISSION TRAJECTORY:**\n\n` +
+        replyText = `🧭 **NOMINAL MISSION TRAJECTORY & ACTION RECOMMENDATION:**\n\n` +
           `• Proceed with planned autonomous transit to **${telemetry.currentObjective}**.\n` +
           `• Distance remaining to target: **${telemetry.distanceToTargetMeters} meters** (${telemetry.progressPercent}% complete).\n` +
           `• Commanded traverse velocity: **${telemetry.commandedSpeed} m/s**.\n` +

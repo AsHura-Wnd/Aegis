@@ -113,6 +113,17 @@ export class RoverSimulationModel {
 
   public setFaults(faults: Partial<InjectedFaults>): void {
     this.faults = { ...this.faults, ...faults };
+    if (faults.solarDust) {
+      this.dustPct = Math.max(78.0, this.dustPct);
+    }
+    if (faults.lowBattery) {
+      this.batteryPct = Math.min(18.5, this.batteryPct);
+    }
+    if (faults.extremeTemp === 'HOT') {
+      this.motorTempC = Math.max(70.0, this.motorTempC);
+    } else if (faults.extremeTemp === 'COLD') {
+      this.internalTempC = Math.min(-42.0, this.internalTempC);
+    }
   }
 
   public clearFaults(): void {
@@ -131,8 +142,10 @@ export class RoverSimulationModel {
   }
 
   public step(dtSeconds: number = 1.0): RoverTelemetry {
-    this.tick += 1;
-    this.missionTimeSeconds += dtSeconds;
+    if (dtSeconds > 0) {
+      this.tick += 1;
+      this.missionTimeSeconds += dtSeconds;
+    }
 
     // 1. Terrain Sampling at current position
     let terrain = sampleTerrainAt(this.posX, this.posY);

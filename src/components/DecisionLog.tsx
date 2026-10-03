@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AutonomousDecision } from '../engines/decisionEngine';
 import { LogCategory, LogEntry } from '../types/log';
+import { soundFX } from '../utils/audio';
 import {
   AlertTriangle,
   ArrowDownToLine,
@@ -38,9 +39,9 @@ export const DecisionLog: React.FC<DecisionLogProps> = ({
   const getCategoryBadge = (cat: LogCategory) => {
     switch (cat) {
       case 'HAZARD':
-        return 'bg-red-500/20 text-red-300 border-red-500/40';
+        return 'bg-red-500/20 text-red-300 border-red-500/40 shadow-[0_0_8px_rgba(239,68,68,0.3)]';
       case 'DECISION':
-        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40';
+        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-[0_0_8px_rgba(0,229,255,0.2)]';
       case 'SCENARIO':
         return 'bg-purple-500/20 text-purple-300 border-purple-500/40';
       case 'MODE_CHANGE':
@@ -51,6 +52,7 @@ export const DecisionLog: React.FC<DecisionLogProps> = ({
   };
 
   const exportJson = () => {
+    soundFX.playClick();
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(logs, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
@@ -61,115 +63,133 @@ export const DecisionLog: React.FC<DecisionLogProps> = ({
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[#0d121d]/90 backdrop-blur-md p-4 shadow-lg flex flex-col h-full">
+    <div className="rounded-2xl hud-panel-pro p-4 shadow-xl flex flex-col h-full border border-white/10">
       {/* Log Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-white/10">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <FileText className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-xs font-mono font-bold tracking-wider text-white uppercase">
-            AUTONOMOUS DECISION & EVENT STREAM
+          <h3 className="font-space font-semibold text-xs tracking-wider text-white">
+            Autonomous Decision & Event Stream
           </h3>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-slate-300">
+          <span className="text-[10px] font-space px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-semibold">
             {filteredLogs.length} / {logs.length} Records
           </span>
         </div>
 
-        {/* Export & Actions */}
+        {/* Actions */}
         <div className="flex items-center gap-2">
           <button
             onClick={exportJson}
-            className="px-2.5 py-1 text-[11px] font-mono rounded bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 flex items-center gap-1 transition-all"
+            className="px-2.5 py-1 text-[11px] font-space rounded-lg bg-white/5 hover:bg-cyan-500/10 text-slate-300 hover:text-cyan-300 border border-white/10 hover:border-cyan-500/30 flex items-center gap-1.5 transition-all font-semibold"
             title="Download complete JSON mission telemetry and event log"
           >
-            <ArrowDownToLine className="w-3 h-3" /> Export JSON
+            <ArrowDownToLine className="w-3.5 h-3.5 text-cyan-400" /> Export JSON
           </button>
         </div>
       </div>
 
       {/* Prominent Recent Autonomous Decision Card */}
       {recentDecision && (
-        <div className="mb-3 p-3 rounded-lg border border-cyan-500/40 bg-gradient-to-r from-cyan-950/40 to-[#0a101d] shadow-cyan-500/10 shadow-md">
-          <div className="flex items-center justify-between mb-1">
+        <div className="mb-3 p-3.5 rounded-xl border border-cyan-500/50 bg-gradient-to-r from-cyan-950/40 via-[#0a1222] to-[#060913] shadow-[0_0_20px_rgba(0,229,255,0.15)] relative overflow-hidden">
+          <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="text-[10px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
-                MOST RECENT AUTONOMOUS DECISION
+              <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span className="text-[11px] font-space font-semibold text-cyan-300 tracking-wide">
+                Most Recent Autonomous Decision
               </span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400">
-              {recentDecision.time} (Confidence: {recentDecision.confidencePercent}%)
+            <span className="text-[10px] font-space text-slate-400">
+              {recentDecision.time} (Confidence: <strong className="text-emerald-400">{recentDecision.confidencePercent}%</strong>)
             </span>
           </div>
 
-          <div className="text-xs font-semibold text-white font-sans mt-0.5">
+          <div className="text-xs font-bold font-mono text-white mb-1 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
             {recentDecision.actionTaken}
           </div>
-          <p className="text-[11px] text-slate-300 font-sans mt-1 leading-relaxed">
+
+          <p className="text-[11.5px] text-slate-300 font-sans leading-relaxed mb-2">
             {recentDecision.rationale}
           </p>
-          <div className="mt-2 flex items-center gap-2 text-[10px] font-mono">
-            <span className="text-slate-400">MODE TRANSITION:</span>
-            <span className="px-1.5 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
-              {recentDecision.operationalMode}
+
+          <div className="flex flex-wrap gap-2 text-[10px] font-mono text-slate-400 pt-1.5 border-t border-white/5">
+            <span>
+              Target Mode: <strong className="text-cyan-300">{recentDecision.recommendedMode}</strong>
             </span>
-            <span className="text-cyan-400">➔</span>
-            <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">
-              {recentDecision.recommendedMode}
+            <span>•</span>
+            <span>
+              Trigger: <strong className="text-amber-300">{recentDecision.triggerHazard || 'NOMINAL'}</strong>
+            </span>
+            <span>•</span>
+            <span>
+              Current Mode: <strong className="text-cyan-300">{recentDecision.operationalMode}</strong>
             </span>
           </div>
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1 mb-2.5 overflow-x-auto pb-1">
-        {(['ALL', 'HAZARD', 'DECISION', 'SCENARIO', 'SYSTEM'] as const).map((cat) => (
+      {/* Category Filter Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 border-b border-white/5 font-space text-[11px]">
+        {[
+          { key: 'ALL', label: 'All Logs' },
+          { key: 'DECISION', label: 'Decisions' },
+          { key: 'HAZARD', label: 'Hazards' },
+          { key: 'SCENARIO', label: 'Scenarios' },
+          { key: 'MODE_CHANGE', label: 'Mode Changes' },
+        ].map((item) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-2 py-0.5 text-[10px] font-mono rounded transition-all shrink-0 ${
-              selectedCategory === cat
-                ? 'bg-cyan-500 text-black font-bold shadow-sm'
-                : 'bg-white/5 text-slate-400 hover:text-white'
+            key={item.key}
+            onClick={() => {
+              soundFX.playClick();
+              setSelectedCategory(item.key as any);
+            }}
+            className={`px-3 py-1 rounded-full transition-all font-semibold shrink-0 ${
+              selectedCategory === item.key
+                ? 'bg-cyan-500 text-black shadow-[0_0_8px_rgba(0,229,255,0.4)]'
+                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
             }`}
           >
-            {cat}
+            {item.label}
           </button>
         ))}
       </div>
 
-      {/* Logs Scrollable Stream */}
-      <div className="flex-1 overflow-y-auto space-y-2 max-h-[320px] pr-1">
+      {/* Real-Time Terminal Event Log Stream */}
+      <div className="flex-1 overflow-y-auto space-y-2 max-h-[300px] pr-1 font-space text-xs">
         {filteredLogs.length === 0 ? (
-          <div className="py-6 text-center text-xs text-slate-500 font-mono">
-            No event records matching active filter.
+          <div className="py-8 text-center text-slate-500">
+            No event logs found for this filter criteria.
           </div>
         ) : (
           filteredLogs.map((log) => (
             <div
               key={log.id}
-              className="p-2.5 rounded-lg border border-white/5 bg-[#0a0e18] hover:border-white/15 transition-all text-xs font-sans"
+              className="p-2.5 rounded-xl border border-white/5 bg-[#070b14]/70 hover:border-cyan-500/30 transition-all"
             >
               <div className="flex items-center justify-between gap-2 mb-1">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border font-semibold ${getCategoryBadge(log.category)}`}>
+                  <span className="text-[10px] text-slate-400 font-semibold">{log.time}</span>
+                  <span
+                    className={`text-[9.5px] px-2 py-0.5 rounded border font-semibold ${getCategoryBadge(
+                      log.category
+                    )}`}
+                  >
                     {log.category}
                   </span>
-                  <span className="font-semibold text-slate-200 line-clamp-1">
-                    {log.title}
-                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                  {log.time}
+                <span className="text-[10px] text-slate-500 font-space">
+                  Source: {log.source}
                 </span>
               </div>
 
-              <p className="text-[11px] text-slate-300 leading-relaxed font-sans">
+              <div className="font-bold text-slate-200 text-[11px] mb-0.5">{log.title}</div>
+              <p className="text-[10.5px] text-slate-400 font-sans leading-relaxed">
                 {log.description}
               </p>
 
               {log.recommendedAction && (
-                <div className="mt-1 text-[10px] font-mono text-amber-300">
-                  ACTION: {log.recommendedAction}
+                <div className="mt-1.5 pt-1 border-t border-white/5 text-[10px] text-amber-300/90 font-sans">
+                  <strong className="text-amber-400 font-space font-semibold">Action:</strong> {log.recommendedAction}
                 </div>
               )}
             </div>

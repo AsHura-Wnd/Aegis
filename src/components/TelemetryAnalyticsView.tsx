@@ -29,18 +29,22 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
     const range = maxY - minY || 1;
 
     return (
-      <div className="p-4 rounded-xl border border-white/10 bg-[#0d121d]/90 backdrop-blur-md">
+      <div className="p-4 rounded-2xl hud-panel-pro shadow-xl border border-white/10">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+          <h4 className="font-space font-semibold text-xs text-white tracking-wide">
             {title}
           </h4>
           <div className="flex items-center gap-3">
             {series.map((s) => (
-              <div key={s.name} className="flex items-center gap-1.5 text-[11px] font-mono">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-slate-300">{s.name}:</span>
-                <strong className="text-white">
-                  {s.data[s.data.length - 1] ?? 0}{s.unit}
+              <div key={s.name} className="flex items-center gap-1.5 text-[11px] font-space">
+                <span
+                  className="w-2.5 h-2.5 rounded-full shadow-[0_0_6px_currentColor]"
+                  style={{ backgroundColor: s.color, color: s.color }}
+                />
+                <span className="text-slate-400">{s.name}:</span>
+                <strong className="text-white font-bold">
+                  {s.data[s.data.length - 1] ?? 0}
+                  {s.unit}
                 </strong>
               </div>
             ))}
@@ -60,7 +64,7 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
                     y1={y}
                     x2={width - padding.right}
                     y2={y}
-                    stroke="rgba(255, 255, 255, 0.06)"
+                    stroke="rgba(255, 255, 255, 0.08)"
                     strokeDasharray="3 3"
                   />
                   <text
@@ -93,10 +97,11 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
                   key={s.name}
                   fill="none"
                   stroke={s.color}
-                  strokeWidth="2.2"
+                  strokeWidth="2.4"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   points={points}
+                  className="drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]"
                 />
               );
             })}
@@ -108,103 +113,162 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      {/* Top Header */}
+      <div className="p-4 rounded-2xl hud-panel-pro flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-white/10">
         <div>
-          <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-            HIGH-FREQUENCY SUBSYSTEM TELEMETRY ANALYTICS
-          </h2>
-          <p className="text-xs text-slate-400 font-sans mt-0.5">
-            Real-time digital sampling stream across avionics, mobility, thermal, and power buses.
+          <div className="flex items-center gap-2.5">
+            <Activity className="w-5 h-5 text-cyan-400" />
+            <h2 className="font-space font-bold text-sm tracking-wide text-white">
+              High-Frequency Subsystem Telemetry Analytics
+            </h2>
+          </div>
+          <p className="text-xs text-slate-400 font-space mt-0.5">
+            Multi-vector time-series trend analysis buffer over the last 60 simulation cycles.
           </p>
         </div>
-        <span className="text-xs font-mono px-2 py-1 rounded bg-white/5 text-cyan-300 border border-white/10">
-          BUFFER: {recentHistory.length} Ticks
-        </span>
+
+        <div className="flex items-center gap-2 font-space text-xs">
+          <span className="px-2.5 py-1 rounded-lg bg-black/60 border border-white/10 text-cyan-300">
+            Buffer: {history.length} pts
+          </span>
+          <span className="px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 font-bold">
+            Sampling: 1000ms
+          </span>
+        </div>
       </div>
 
+      {/* 2x2 Grid of In-Depth Subsystem Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Power Subsystem Chart */}
+        {/* Chart 1: Power Dynamics */}
         {renderMultiChart(
           [
-            { name: 'Battery', data: recentHistory.map((h) => h.battery), color: '#00e5ff', unit: '%' },
-            { name: 'Solar', data: recentHistory.map((h) => h.solar), color: '#eab308', unit: '%' },
+            {
+              name: 'Battery SOC',
+              data: recentHistory.map((h) => Number(h.battery.toFixed(1))),
+              color: '#00e5ff',
+              unit: '%',
+            },
+            {
+              name: 'Solar Eff.',
+              data: recentHistory.map((h) => Number(h.solar.toFixed(1))),
+              color: '#eab308',
+              unit: '%',
+            },
           ],
-          'Power Reserves: Battery State-of-Charge vs Solar Yield',
+          'Power & Storage (Battery SOC vs Solar Efficiency)',
           0,
           100
         )}
 
-        {/* Thermal Balance Chart */}
+        {/* Chart 2: Thermal Management */}
         {renderMultiChart(
           [
-            { name: 'Motor Temp', data: recentHistory.map((h) => h.temperature), color: '#f97316', unit: '°C' },
-            { name: 'Power Draw', data: recentHistory.map((h) => h.power / 5), color: '#a855f7', unit: ' (x5W)' },
+            {
+              name: 'Motors',
+              data: recentHistory.map((h) => Number(h.temperature.toFixed(1))),
+              color: '#f97316',
+              unit: '°C',
+            },
           ],
-          'Thermal-Electromechanical Correlation',
+          'Thermal Equilibrium (Drive Motors Temperature)',
           -20,
-          100
+          90
         )}
 
-        {/* Mobility Dynamics Chart */}
+        {/* Chart 3: Locomotion & Slip */}
         {renderMultiChart(
           [
-            { name: 'Slip Ratio', data: recentHistory.map((h) => h.wheelSlip * 100), color: '#ef4444', unit: '%' },
-            { name: 'Speed', data: recentHistory.map((h) => h.speed * 500), color: '#10b981', unit: ' (m/s*500)' },
+            {
+              name: 'Traverse Speed',
+              data: recentHistory.map((h) => Number((h.speed * 100).toFixed(1))),
+              color: '#10b981',
+              unit: 'cm/s',
+            },
+            {
+              name: 'Avg Slip',
+              data: recentHistory.map((h) => Number((h.wheelSlip * 100).toFixed(0))),
+              color: '#ef4444',
+              unit: '%',
+            },
           ],
-          'Mobility & Traction Dynamics',
+          'Locomotion Dynamics (Speed cm/s vs Slip %)',
           0,
           100
         )}
 
-        {/* Risk Trend Chart */}
+        {/* Chart 4: Comm Relay & Mission Risk */}
         {renderMultiChart(
           [
-            { name: 'Risk Score', data: recentHistory.map((h) => h.riskScore), color: '#ec4899', unit: '/100' },
-            { name: 'Signal Link', data: recentHistory.map((h) => Math.max(0, h.signal + 120)), color: '#38bdf8', unit: ' dBm' },
+            {
+              name: 'Mission Risk Score',
+              data: recentHistory.map((h) => h.riskScore),
+              color: '#a855f7',
+              unit: 'pts',
+            },
           ],
-          'Overall Mission Risk vs Downlink Carrier Quality',
+          'Dynamic Risk Score Over Time',
           0,
           100
         )}
       </div>
 
-      {/* Subsystem Technical Status Breakdown Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="p-3.5 rounded-xl border border-white/10 bg-[#0d121d]/80 text-xs font-mono">
-          <div className="text-cyan-400 font-bold mb-2 flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5" /> ELECTRICAL BUS PROFILE
-          </div>
-          <div className="space-y-1 text-slate-300">
-            <div className="flex justify-between"><span>Nominal Bus:</span> <span>{telemetry.batteryVoltage} V</span></div>
-            <div className="flex justify-between"><span>Solar Output:</span> <span>{telemetry.solarGenerationWatts} W</span></div>
-            <div className="flex justify-between"><span>Base Avionics Draw:</span> <span>120.0 W</span></div>
-            <div className="flex justify-between"><span>Actuator Load:</span> <span>{(telemetry.powerConsumptionWatts - 120).toFixed(0)} W</span></div>
-          </div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-white/10 bg-[#0d121d]/80 text-xs font-mono">
-          <div className="text-amber-400 font-bold mb-2 flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5" /> THERMAL LOOP METRICS
-          </div>
-          <div className="space-y-1 text-slate-300">
-            <div className="flex justify-between"><span>Chassis Core:</span> <span>{telemetry.internalTemp}°C</span></div>
-            <div className="flex justify-between"><span>Motor Average:</span> <span>{telemetry.motorAverageTemp}°C</span></div>
-            <div className="flex justify-between"><span>Ambient Jezero:</span> <span>{telemetry.ambientTemp}°C</span></div>
-            <div className="flex justify-between"><span>Heaters Loop:</span> <span>{telemetry.heatersActive ? 'ACTIVE' : 'STANDBY'}</span></div>
-          </div>
-        </div>
-
-        <div className="p-3.5 rounded-xl border border-white/10 bg-[#0d121d]/80 text-xs font-mono">
-          <div className="text-emerald-400 font-bold mb-2 flex items-center gap-1.5">
-            <Gauge className="w-3.5 h-3.5" /> ROCKER-BOGIE MOBILITY
-          </div>
-          <div className="space-y-1 text-slate-300">
-            <div className="flex justify-between"><span>Terrain Incline:</span> <span>{telemetry.slopeAngle}°</span></div>
-            <div className="flex justify-between"><span>Terrain Roughness:</span> <span>{telemetry.roughnessIndex}</span></div>
-            <div className="flex justify-between"><span>Average Slip:</span> <span>{(telemetry.wheelSlipAverage * 100).toFixed(0)}%</span></div>
-            <div className="flex justify-between"><span>Drive Status:</span> <span>{telemetry.isStuck ? 'STALL SINKAGE' : 'TRACKING'}</span></div>
-          </div>
-        </div>
+      {/* Numerical Subsystem Summary Table */}
+      <div className="p-4 rounded-2xl hud-panel-pro shadow-xl border border-white/10 overflow-x-auto">
+        <h3 className="font-space font-semibold text-xs text-white tracking-wide mb-3">
+          Instantaneous Sensor Telemetry Summary Matrix
+        </h3>
+        <table className="w-full text-left text-xs font-space border-collapse">
+          <thead>
+            <tr className="border-b border-white/10 text-slate-400 text-[11px]">
+              <th className="py-2.5 px-3">Subsystem Metric</th>
+              <th className="py-2.5 px-3">Current Value</th>
+              <th className="py-2.5 px-3">Nominal Range</th>
+              <th className="py-2.5 px-3">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5">
+            <tr>
+              <td className="py-2.5 px-3 text-slate-300 font-semibold">Battery State of Charge</td>
+              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.batteryLevel.toFixed(1)}% ({telemetry.batteryVoltage}V)</td>
+              <td className="py-2.5 px-3 text-slate-400">&gt; 25% (Critical: &lt; 15%)</td>
+              <td className="py-2.5 px-3">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.batteryLevel > 25 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400 animate-pulse'}`}>
+                  {telemetry.batteryLevel > 25 ? 'Nominal' : 'Warning'}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2.5 px-3 text-slate-300 font-semibold">Drive Motor Temperature</td>
+              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.motorAverageTemp.toFixed(1)}°C</td>
+              <td className="py-2.5 px-3 text-slate-400">-40°C to +50°C (Limit: 68°C)</td>
+              <td className="py-2.5 px-3">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.motorAverageTemp < 50 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-amber-950/80 text-amber-400'}`}>
+                  {telemetry.motorAverageTemp < 50 ? 'Nominal' : 'High'}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2.5 px-3 text-slate-300 font-semibold">Rocker-Bogie Wheel Slip</td>
+              <td className="py-2.5 px-3 text-cyan-300 font-bold">{(telemetry.wheelSlipAverage * 100).toFixed(0)}%</td>
+              <td className="py-2.5 px-3 text-slate-400">&lt; 35% (Stall: &gt; 60%)</td>
+              <td className="py-2.5 px-3">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.wheelSlipAverage < 0.35 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400'}`}>
+                  {telemetry.wheelSlipAverage < 0.35 ? 'Traction OK' : 'Slip Critical'}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td className="py-2.5 px-3 text-slate-300 font-semibold">Relay Comm Signal</td>
+              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.signalStrengthDbm} dBm ({telemetry.packetLossPercent}% loss)</td>
+              <td className="py-2.5 px-3 text-slate-400">&gt; -92 dBm (LOS: &lt; -108 dBm)</td>
+              <td className="py-2.5 px-3">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.relayConnected ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400'}`}>
+                  {telemetry.relayConnected ? 'Locked' : 'LOS'}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

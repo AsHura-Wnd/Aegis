@@ -21,6 +21,7 @@ import { LogEntry } from './types/log';
 import { RiskAssessment } from './types/risk';
 import { ScenarioId } from './types/scenario';
 import { RoverTelemetry, TelemetryHistoryPoint } from './types/telemetry';
+import { soundFX } from './utils/audio';
 
 export function App() {
   // Navigation & Modal State
@@ -138,7 +139,7 @@ export function App() {
       timestamp: Date.now(),
       category: 'SCENARIO',
       severity: scenarioDef.expectedRiskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-      title: `OPERATOR INJECTED SCENARIO: ${scenarioDef.name}`,
+      title: `Operator Injected Scenario: ${scenarioDef.name}`,
       description: scenarioDef.fullDesc,
       recommendedAction: scenarioDef.suggestedMitigation,
       source: 'SCENARIO_INJECTOR',
@@ -167,7 +168,6 @@ export function App() {
         break;
     }
 
-    // Immediately trigger tick to evaluate consequences
     tickSimulation();
   };
 
@@ -183,7 +183,7 @@ export function App() {
       timestamp: Date.now(),
       category: 'SCENARIO',
       severity: 'LOW',
-      title: 'OPERATOR CLEARED ALL FAULT INJECTIONS',
+      title: 'Operator Cleared All Fault Injections',
       description: 'Rover subsystems commanded back to nominal operating profiles. Standby for stabilization.',
       source: 'OPERATOR',
     };
@@ -213,7 +213,7 @@ export function App() {
       timestamp: Date.now(),
       category: 'SYSTEM',
       severity: 'LOW',
-      title: 'MISSION SIMULATION RESET',
+      title: 'Mission Simulation Reset',
       description: `AEGIS initialized at Base Depo (Seed: ${newSeed}). All subsystems nominal.`,
       source: 'SYSTEM',
     };
@@ -237,7 +237,7 @@ export function App() {
       timestamp: Date.now(),
       category: 'DECISION',
       severity: 'LOW',
-      title: `EXECUTING MITIGATION: ${hazard.hazardName}`,
+      title: `Executing Mitigation: ${hazard.hazardName}`,
       description: hazard.recommendedAction,
       source: 'AUTONOMOUS_EXECUTIVE',
     };
@@ -271,33 +271,44 @@ export function App() {
     tickSimulation();
   };
 
+  const handleTabChange = (tab: 'DASHBOARD' | 'MAP' | 'TELEMETRY' | 'ASSISTANT' | 'LOGS') => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      try {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch {
+        // Safe fallback in test environments
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#080b11] text-slate-100 flex flex-col font-sans bg-grid-pattern selection:bg-cyan-500/30">
-      {/* Header with Navigation and Clock */}
+    <div className="min-h-screen bg-[#04060b] bg-space-dark text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30">
+      {/* Flight Control Deck Top Header Bar */}
       <Header
         telemetry={telemetry}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         onOpenBenchmark={() => setIsBenchmarkOpen(true)}
         onOpenMatrix={() => setIsMatrixOpen(true)}
         seed={seed}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 space-y-4">
-        {/* Dynamic Risk Assessment Banner (Always visible across all tabs for mission safety) */}
+      {/* Main Mission Operations Center Content Area */}
+      <main className="flex-1 max-w-[1480px] w-full mx-auto px-4 py-4 space-y-4">
+        {/* Dynamic Compounding Risk Assessment Banner (Global across views for mission flight safety) */}
         <RiskBanner risk={riskAssessment} activeHazardCount={activeHazards.length} />
 
-        {/* Tab 1: DASHBOARD (Main Mission Overview) */}
+        {/* Tab 1: DASHBOARD (Main Flight Operations Console) */}
         {activeTab === 'DASHBOARD' && (
           <div className="space-y-4">
-            {/* Live Telemetry Monitors */}
+            {/* Live Subsystem Telemetry Cards & Blueprint */}
             <TelemetryCards telemetry={telemetry} history={telemetryHistory} />
 
-            {/* Middle Grid: Tactical Map (Left) & Active Hazards / AI (Right) */}
+            {/* Tactical Reconnaissance Map & Real-Time Hazard/Decision Feed */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-              {/* Tactical Surface Map */}
-              <div className="lg:col-span-7 h-[420px]">
+              {/* Tactical Surface Map (7 Columns) */}
+              <div className="lg:col-span-7 h-[440px]">
                 <MissionMap
                   telemetry={telemetry}
                   trail={simModelRef.current.getTrail()}
@@ -305,7 +316,7 @@ export function App() {
                 />
               </div>
 
-              {/* Active Hazards & Fast AI Assistant */}
+              {/* Active 9-Vector Hazards Panel & Real-Time Decision Stream (5 Columns) */}
               <div className="lg:col-span-5 flex flex-col gap-4">
                 <div className="flex-1 min-h-[220px]">
                   <ActiveHazardsPanel
@@ -324,7 +335,7 @@ export function App() {
               </div>
             </div>
 
-            {/* Scenario Simulator Controller Panel */}
+            {/* Scenario Simulator & Anomaly Injection Matrix */}
             <ScenarioController
               isRunning={isRunning}
               onTogglePlay={() => setIsRunning(!isRunning)}
@@ -340,10 +351,10 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 2: MAP (Expanded Tactical Map View) */}
+        {/* Tab 2: MAP (Expanded Tactical Reconnaissance Map) */}
         {activeTab === 'MAP' && (
           <div className="space-y-4">
-            <div className="h-[620px]">
+            <div className="h-[640px]">
               <MissionMap
                 telemetry={telemetry}
                 trail={simModelRef.current.getTrail()}
@@ -365,15 +376,15 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 3: TELEMETRY (Detailed Analytics View) */}
+        {/* Tab 3: TELEMETRY (Detailed Multi-Axis Analytics) */}
         {activeTab === 'TELEMETRY' && (
           <TelemetryAnalyticsView telemetry={telemetry} history={telemetryHistory} />
         )}
 
-        {/* Tab 4: ASSISTANT (Dedicated AEGIS-Core AI View) */}
+        {/* Tab 4: ASSISTANT (Dedicated AEGIS-Core Flight AI Console) */}
         {activeTab === 'ASSISTANT' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-8 min-h-[580px]">
+            <div className="lg:col-span-8 min-h-[600px]">
               <AIAssistant
                 telemetry={telemetry}
                 activeHazards={activeHazards}
@@ -396,10 +407,10 @@ export function App() {
           </div>
         )}
 
-        {/* Tab 5: LOGS (Complete Decision Stream View) */}
+        {/* Tab 5: LOGS (Full Decision Stream View) */}
         {activeTab === 'LOGS' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-8 min-h-[580px]">
+            <div className="lg:col-span-8 min-h-[600px]">
               <DecisionLog
                 logs={logs}
                 recentDecision={recentDecision}
@@ -428,6 +439,26 @@ export function App() {
           </div>
         )}
       </main>
+
+      {/* Flight Control Deck Status Footer */}
+      <footer className="border-t border-white/5 bg-[#03050a] py-2.5 px-4 text-[11px] font-space text-slate-500">
+        <div className="max-w-[1480px] mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981]" />
+            <span className="text-slate-400 font-semibold">AEGIS Flight System Integrity: 100% Nominal</span>
+            <span className="text-slate-700">|</span>
+            <span>Autonomy Engine v4.2</span>
+          </div>
+
+          <div className="flex items-center gap-4 text-slate-400">
+            <span>Coords: {telemetry.position.x}E, {telemetry.position.y}N</span>
+            <span className="text-slate-700">|</span>
+            <span>Battery: {telemetry.batteryLevel.toFixed(1)}% ({telemetry.batteryVoltage}V)</span>
+            <span className="text-slate-700">|</span>
+            <span className="text-cyan-400 font-semibold">Jezero Crater Sector 4</span>
+          </div>
+        </div>
+      </footer>
 
       {/* Modals */}
       <BaselineComparisonModal

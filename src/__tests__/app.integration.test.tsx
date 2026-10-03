@@ -33,6 +33,7 @@ beforeAll(() => {
   }) as any;
 
   window.HTMLElement.prototype.scrollIntoView = vi.fn();
+  window.scrollTo = vi.fn();
 });
 
 afterEach(() => {
@@ -49,14 +50,14 @@ describe('AEGIS Mission Control Dashboard Integration Tests', () => {
     expect(screen.getByText(/OVERALL MISSION RISK/i)).toBeDefined();
 
     // Telemetry Cards checks
-    expect(screen.getByText('BATTERY SOC')).toBeDefined();
-    expect(screen.getByText('THERMAL SUBSYSTEM')).toBeDefined();
-    expect(screen.getByText('SOLAR EFFICIENCY')).toBeDefined();
-    expect(screen.getByText('RELAY LINK QUALITY')).toBeDefined();
-    expect(screen.getByText('6-WHEEL SLIP STATUS')).toBeDefined();
-    expect(screen.getByText('SPEED & ATTITUDE')).toBeDefined();
-    expect(screen.getByText('POWER CONSUMPTION')).toBeDefined();
-    expect(screen.getByText('MISSION PROGRESS')).toBeDefined();
+    expect(screen.getByText('Battery SOC')).toBeDefined();
+    expect(screen.getByText('Thermal Subsystem')).toBeDefined();
+    expect(screen.getByText('Solar Efficiency')).toBeDefined();
+    expect(screen.getByText('Relay Link Quality')).toBeDefined();
+    expect(screen.getByText('6-Wheel Slip Status')).toBeDefined();
+    expect(screen.getByText('Speed & Attitude')).toBeDefined();
+    expect(screen.getByText('Power Consumption')).toBeDefined();
+    expect(screen.getByText('Mission Progress')).toBeDefined();
 
     // Scenario controls checks
     expect(screen.getByText(/SCENARIO SIMULATOR & FAULT INJECTION/i)).toBeDefined();
