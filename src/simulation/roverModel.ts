@@ -128,6 +128,11 @@ export class RoverSimulationModel {
 
   public clearFaults(): void {
     this.faults = { ...INITIAL_FAULTS };
+    if (this.batteryPct < 50) {
+      this.batteryPct = 85.0;
+    }
+    this.motorTempC = 28.2;
+    this.dustPct = 12.0;
     if (this.operationalMode === 'SAFE_HOLD' || this.operationalMode === 'EMERGENCY_RECOVERY') {
       this.operationalMode = 'AUTONOMOUS_TRANSIT';
     }

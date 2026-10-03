@@ -61,6 +61,7 @@ export class HeadlessBenchmarkEngine {
     let aegisResolutionSecSum = 0;
     let baselineResolutionSecSum = 0;
     let incidentsSampled = 0;
+    let aegisRolloversAvoided = 0;
 
     for (let m = 0; m < numMissions; m++) {
       const seed = 1000 + m * 37;
@@ -114,6 +115,11 @@ export class HeadlessBenchmarkEngine {
           aegisTotalHazards += 1;
         }
 
+        // Count steep terrain rollover hazards avoided autonomously
+        if (telemAegis.slopeAngle > 18 || hazardsAegis.some((h) => h.hazardType === 'DANGEROUS_TERRAIN')) {
+          aegisRolloversAvoided += 1;
+        }
+
         if (telemAegis.batteryLevel < 4 || telemAegis.internalTemp > 75) {
           aegisFailed = true;
         }
@@ -165,7 +171,7 @@ export class HeadlessBenchmarkEngine {
         batteryRemainingAveragePercent: Number((aegisBatteryEndSum / numMissions).toFixed(1)),
         totalHazardsEncountered: aegisTotalHazards,
         totalHazardsMitigatedAutonomously: aegisMitigated,
-        rolloversAvoided: Math.round(numMissions * 0.4),
+        rolloversAvoided: aegisRolloversAvoided,
       },
       baselineTeleoperation: {
         survivalRatePercent: baseSurvRate,

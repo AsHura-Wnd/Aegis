@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { missionService } from '../services/missionService';
 import { SCENARIO_CATALOG } from '../../simulation/scenarioDefinitions';
+import { DEFAULT_HAZARD_CONFIGS } from '../../engines/hazardEngine';
 import { ScenarioId } from '../../types/scenario';
 import { HazardType } from '../../types/hazard';
 
@@ -30,10 +31,15 @@ missionRouter.get('/', (_req: Request, res: Response) => {
 // 2. Create a new mission
 missionRouter.post('/', (req: Request, res: Response) => {
   const { name, seed, id } = req.body || {};
+  if (seed !== undefined && isNaN(Number(seed))) {
+    res.status(400).json({ error: "Invalid 'seed' provided; must be a valid number" });
+    return;
+  }
+  const safeSeed = (seed !== undefined && !isNaN(Number(seed))) ? Math.floor(Number(seed)) : 1337;
   const newMission = missionService.createMission(
-    name,
-    seed !== undefined ? Number(seed) : 1337,
-    id
+    name ? String(name).trim() : undefined,
+    safeSeed,
+    id ? String(id).trim() : undefined
   );
   res.status(201).json({
     message: 'Mission created successfully',
@@ -86,7 +92,8 @@ missionRouter.post('/:id/start', (req: Request, res: Response) => {
   const mission = getMissionOr404(req, res);
   if (!mission) return;
 
-  const speed = Number(req.body?.speedMultiplier) || 1;
+  const rawSpeed = Number(req.body?.speedMultiplier);
+  const speed = (!isNaN(rawSpeed) && rawSpeed > 0) ? Math.min(10, Math.max(0.2, rawSpeed)) : 1;
   mission.start(speed);
 
   res.json({
@@ -131,6 +138,14 @@ missionRouter.put('/:id/hazards/:type', (req: Request, res: Response) => {
   if (!mission) return;
 
   const hazardType = req.params.type as HazardType;
+  if (!Object.keys(DEFAULT_HAZARD_CONFIGS).includes(hazardType)) {
+    res.status(400).json({
+      error: `Unknown hazard rule type: '${hazardType}'`,
+      validTypes: Object.keys(DEFAULT_HAZARD_CONFIGS),
+    });
+    return;
+  }
+
   mission.updateHazardConfig(hazardType, req.body || {});
 
   res.json({
@@ -203,6 +218,14 @@ missionRouter.post('/:id/mitigate', (req: Request, res: Response) => {
   if (!mission) return;
 
   const hazardType = req.body?.hazardType as HazardType | undefined;
+  if (hazardType && !Object.keys(DEFAULT_HAZARD_CONFIGS).includes(hazardType)) {
+    res.status(400).json({
+      error: `Unknown hazardType '${hazardType}'`,
+      validTypes: Object.keys(DEFAULT_HAZARD_CONFIGS),
+    });
+    return;
+  }
+
   const result = mission.executeMitigation(hazardType);
 
   res.json({
@@ -239,19 +262,19 @@ missionRouter.post('/:id/assistant', async (req: Request, res: Response) => {
   if (!mission) return;
 
   const query = req.body?.query;
-  if (!query || typeof query !== 'string') {
-    res.status(400).json({ error: "Missing 'query' string in request body" });
+  if (!query || typeof query !== 'string' || !query.trim()) {
+    res.status(400).json({ error: "Missing or empty 'query' string in request body" });
     return;
   }
 
   const apiKey = req.body?.apiKey;
-  if (apiKey) {
+  if (apiKey && typeof apiKey === 'string') {
     mission.setApiKey(apiKey);
   }
 
   try {
-    const response = await mission.askAssistant(query);
-    res.json({ query, response });
+    const response = await mission.askAssistant(query.trim());
+    res.json({ query: query.trim(), response });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -262,7 +285,16 @@ missionRouter.post('/:id/reset', (req: Request, res: Response) => {
   const mission = getMissionOr404(req, res);
   if (!mission) return;
 
-  const seed = req.body?.seed !== undefined ? Number(req.body.seed) : undefined;
+  let seed: number | undefined = undefined;
+  if (req.body?.seed !== undefined) {
+    const parsed = Number(req.body.seed);
+    if (isNaN(parsed)) {
+      res.status(400).json({ error: "Invalid 'seed' provided; must be a valid number" });
+      return;
+    }
+    seed = Math.floor(parsed);
+  }
+
   mission.reset(seed);
 
   res.json({
