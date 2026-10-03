@@ -117,7 +117,7 @@ export class RoverSimulationModel {
       this.dustPct = Math.max(78.0, this.dustPct);
     }
     if (faults.lowBattery) {
-      this.batteryPct = Math.min(18.5, this.batteryPct);
+      this.batteryPct = Math.min(13.5, this.batteryPct);
     }
     if (faults.extremeTemp === 'HOT') {
       this.motorTempC = Math.max(70.0, this.motorTempC);

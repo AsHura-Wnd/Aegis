@@ -103,7 +103,7 @@ export class AutonomousDecisionEngine {
           confidencePercent: 96,
         };
       }
-    } else if (activeHazards.some((h) => h.hazardType === 'LOW_BATTERY' && h.severity === 'CRITICAL')) {
+    } else if (activeHazards.some((h) => h.hazardType === 'LOW_BATTERY' && (h.severity === 'CRITICAL' || h.severity === 'HIGH'))) {
       if (telemetry.operationalMode !== 'RECHARGE_STANDBY') {
         modeOverride = 'RECHARGE_STANDBY';
         decision = {

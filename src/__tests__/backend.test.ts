@@ -225,4 +225,32 @@ describe('AEGIS Backend REST API Test Suite', () => {
     );
     expect(res.body.results.improvementDeltas.resolutionSpeedupFactor).toBeGreaterThan(10);
   });
+
+  // 12. Regression: GET /api/benchmark returns default 20-mission baseline
+  it('GET /api/benchmark returns default 20-mission baseline benchmark metrics', async () => {
+    const res = await request(app).get('/api/benchmark');
+    expect(res.status).toBe(200);
+    expect(res.body.results.missionCount).toBe(20);
+    expect(res.body.results.totalTicksSimulated).toBe(500);
+    expect(res.body.results.aegis.survivalRatePercent).toBe(100);
+  });
+
+  // 13. Regression: LOW_BATTERY scenario transitions mode to RECHARGE_STANDBY and normalizes on clear
+  it('regression: LOW_BATTERY scenario triggers RECHARGE_STANDBY and normalizes battery on clear', async () => {
+    const injectRes = await request(app)
+      .post('/api/missions/primary-mission/scenarios')
+      .send({ scenarioId: 'LOW_BATTERY' });
+
+    expect(injectRes.status).toBe(200);
+    expect(injectRes.body.telemetry.operationalMode).toBe('RECHARGE_STANDBY');
+    expect(injectRes.body.telemetry.batteryLevel).toBeLessThan(15);
+    expect(injectRes.body.risk.riskLevel).toBe('CRITICAL');
+
+    // Clear faults
+    const clearRes = await request(app).post('/api/missions/primary-mission/scenarios/clear');
+    expect(clearRes.status).toBe(200);
+    expect(clearRes.body.telemetry.batteryLevel).toBeGreaterThanOrEqual(80);
+    expect(clearRes.body.telemetry.operationalMode).toBe('AUTONOMOUS_TRANSIT');
+    expect(clearRes.body.risk.riskLevel).toBe('LOW');
+  });
 });

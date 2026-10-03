@@ -49,17 +49,17 @@ npm run lint
 
  RUN  v5.0.3 D:/Projects/Aegis
 
- ✓ src/__tests__/aegis.test.ts (18 tests) 29ms
- ✓ src/__tests__/backend.test.ts (11 tests) 388ms
- ✓ src/__tests__/app.integration.test.tsx (4 tests) 1817ms
+ ✓ src/__tests__/aegis.test.ts (18 tests) 23ms
+ ✓ src/__tests__/backend.test.ts (13 tests) 467ms
+ ✓ src/__tests__/app.integration.test.tsx (4 tests) 1583ms
    ✓ AEGIS Mission Control Dashboard Integration Tests (4)
-     ✓ renders the complete mission control dashboard without throwing errors 468ms
-     ✓ navigates seamlessly across operational views 439ms
-     ✓ opens and closes the Baseline Comparison and 9 Rules Matrix modals 606ms
+     ✓ renders the complete mission control dashboard without throwing errors 376ms
+     ✓ navigates seamlessly across operational views 358ms
+     ✓ opens and closes the Baseline Comparison and 9 Rules Matrix modals 578ms
 
  Test Files  3 passed (3)
-      Tests  33 passed (33)
-   Duration  4.96s
+      Tests  35 passed (35)
+   Duration  4.51s
 ```
 
 ### 3.2 Live Backend Audit Script (`node scripts/testAudit.mjs`)
@@ -118,7 +118,7 @@ Focuses on pure mathematical and algorithmic correctness of simulation physics, 
 - **Dynamic Risk Engine**: Asserts 0–100 clamping, base environmental scoring, additive hazard weights, and 5 multi-fault compounding multipliers.
 - **Autonomous Decision Engine**: Verifies mode transitions to `EMERGENCY_RECOVERY`, `SAFE_HOLD`, and `HAZARD_AVOIDANCE`.
 
-### 4.2 Backend API Integration Suite (`src/__tests__/backend.test.ts` — 11 Tests)
+### 4.2 Backend API Integration Suite (`src/__tests__/backend.test.ts` — 13 Tests)
 Tests Express routes using Supertest:
 1. `GET /api/health`: Confirms `status: HEALTHY` and uptime.
 2. `GET /api/missions`: Lists active missions including default `primary-mission`.
@@ -131,6 +131,8 @@ Tests Express routes using Supertest:
 9. `POST /api/missions/:id/mitigate`: Executes mitigation and restores nominal mode.
 10. `POST /api/benchmark`: Executes headless Monte Carlo run across 5 missions.
 11. `POST /api/missions/:id/assistant`: Queries AI assistant and receives grounded answer.
+12. `GET /api/benchmark`: Returns default 20-mission baseline benchmark metrics.
+13. `POST /api/missions/:id/scenarios (LOW_BATTERY)`: Regression test verifying mode shift to `RECHARGE_STANDBY` and battery normalization on clear.
 
 ### 4.3 Frontend Integration Suite (`src/__tests__/app.integration.test.tsx` — 4 Tests)
 Tests full user interface and user interaction flows:

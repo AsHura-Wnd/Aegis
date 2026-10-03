@@ -161,7 +161,7 @@ npm run build
 
 ## 🧪 Testing & Verification
 
-AEGIS includes a comprehensive 33-test automated test suite:
+AEGIS includes a comprehensive 35-test automated test suite:
 
 ```bash
 # Run complete test suite (unit, integration, and backend tests)
@@ -170,15 +170,15 @@ npm test
 # Run backend API integration tests specifically
 npm run test:backend
 
-# Run live HTTP audit (tests replay determinism, 6 scenarios, & benchmark)
-node scripts/testAudit.mjs
+# Run live HTTP validation (tests all 22 endpoints, replay determinism, 6 scenarios, & benchmark)
+node scripts/validateBackend.mjs
 ```
 
 ### Verified Test Summary
 - **Unit & Kinematic Tests** (`src/__tests__/aegis.test.ts`): 18/18 passing.
-- **Backend API Tests** (`src/__tests__/backend.test.ts`): 11/11 passing.
+- **Backend API Tests** (`src/__tests__/backend.test.ts`): 13/13 passing.
 - **Frontend Dashboard Tests** (`src/__tests__/app.integration.test.tsx`): 4/4 passing.
-- **Total Passing Tests**: **33 / 33 (100% passing)**.
+- **Total Passing Tests**: **35 / 35 (100% passing)**.
 
 ---
 
