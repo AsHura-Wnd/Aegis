@@ -22,19 +22,19 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
   const rules = Object.values(configs);
 
   return (
-    <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#070b16] border border-cyan-500/50 rounded-2xl max-w-4xl w-full shadow-[0_0_40px_rgba(0,229,255,0.2)] p-6 overflow-y-auto max-h-[90vh] hud-panel-pro">
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-[#0c0c11] border border-white/10 rounded-2xl max-w-4xl w-full p-6 overflow-y-auto max-h-[90vh] aegis-card shadow-2xl">
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.3)]">
-              <Layers className="w-5 h-5 text-cyan-400" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-200">
+              <Layers className="w-5 h-5 text-zinc-300" />
             </div>
             <div>
-              <h2 className="text-sm font-space font-bold text-white tracking-wide">
+              <h2 className="text-sm font-syne font-bold text-white tracking-wide uppercase">
                 AEGIS 9-Vector Hazard Detection Rules Matrix
               </h2>
-              <p className="text-xs text-slate-400 font-space">
+              <p className="text-xs text-zinc-400 font-mono mt-0.5">
                 Modular rule-based engine specifications, thresholds, and autonomous mitigation protocols.
               </p>
             </div>
@@ -44,7 +44,7 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
               soundFX.playClick();
               onClose();
             }}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+            className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-white/5"
           >
             <X className="w-5 h-5" />
           </button>
@@ -52,9 +52,9 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
 
         {/* Rules Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-space border-collapse">
+          <table className="w-full text-left text-xs font-mono border-collapse">
             <thead>
-              <tr className="border-b border-white/10 text-slate-400 text-[11px]">
+              <tr className="border-b border-white/[0.08] text-zinc-500 text-[11px] uppercase tracking-wider">
                 <th className="py-2.5 px-3">#</th>
                 <th className="py-2.5 px-3">Hazard Rule Vector</th>
                 <th className="py-2.5 px-3">Category</th>
@@ -63,21 +63,21 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
                 <th className="py-2.5 px-3 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-slate-300">
+            <tbody className="divide-y divide-white/5 text-zinc-300">
               {rules.map((rule, idx) => (
                 <tr key={rule.hazardType} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 px-3 text-slate-500 font-bold">{idx + 1}</td>
-                  <td className="py-3 px-3 font-semibold text-slate-100 flex items-center gap-2">
+                  <td className="py-3 px-3 text-zinc-600 font-bold">0{idx + 1}</td>
+                  <td className="py-3 px-3 font-semibold text-zinc-100 flex items-center gap-2">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        rule.enabled ? 'bg-cyan-400 shadow-[0_0_6px_#00e5ff]' : 'bg-slate-600'
+                        rule.enabled ? 'bg-zinc-200' : 'bg-zinc-700'
                       }`}
                     />
                     {rule.hazardName}
                   </td>
-                  <td className="py-3 px-3 text-cyan-400 font-semibold">{rule.category}</td>
-                  <td className="py-3 px-3 text-amber-300/90">{rule.description}</td>
-                  <td className="py-3 px-3 text-slate-300 font-space text-xs">
+                  <td className="py-3 px-3 text-zinc-400 font-medium">{rule.category}</td>
+                  <td className="py-3 px-3 text-zinc-400">{rule.description}</td>
+                  <td className="py-3 px-3 text-zinc-300 font-sans text-xs">
                     {rule.defaultAction}
                   </td>
                   <td className="py-3 px-3 text-center">
@@ -86,10 +86,10 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
                         soundFX.playClick();
                         onToggleRule(rule.hazardType);
                       }}
-                      className={`px-3 py-1 rounded-full text-[10px] font-space font-bold transition-all ${
+                      className={`px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase transition-all ${
                         rule.enabled
-                          ? 'bg-emerald-500 text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                          : 'bg-white/10 text-slate-400'
+                          ? 'bg-zinc-100 text-black'
+                          : 'bg-zinc-900 text-zinc-500 border border-white/5'
                       }`}
                     >
                       {rule.enabled ? 'Enabled' : 'Disabled'}
@@ -101,10 +101,18 @@ export const HazardMatrixModal: React.FC<HazardMatrixModalProps> = ({
           </table>
         </div>
 
-        {/* Footer Note */}
-        <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 font-space">
-          <span>Active Rules: {rules.filter((r) => r.enabled).length} / 9</span>
-          <span>Click any rule status pill to toggle live evaluation in simulation</span>
+        {/* Footer */}
+        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 pt-4 mt-2 border-t border-white/5">
+          <span>Continuous Evaluator Cycle: 100ms • Dynamic compounding risk enabled</span>
+          <button
+            onClick={() => {
+              soundFX.playClick();
+              onClose();
+            }}
+            className="px-3 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10"
+          >
+            Close Matrix
+          </button>
         </div>
       </div>
     </div>

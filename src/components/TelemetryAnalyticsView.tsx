@@ -13,7 +13,7 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
 }) => {
   const recentHistory = history.slice(-40);
 
-  // SVG Chart Generator with labels and grid
+  // SVG Chart Generator with clean labels and grid
   const renderMultiChart = (
     series: { name: string; data: number[]; color: string; unit: string }[],
     title: string,
@@ -29,19 +29,19 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
     const range = maxY - minY || 1;
 
     return (
-      <div className="p-4 rounded-2xl hud-panel-pro shadow-xl border border-white/10">
+      <div className="p-4 rounded-2xl aegis-card border border-white/[0.08]">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-space font-semibold text-xs text-white tracking-wide">
+          <h4 className="font-syne font-bold text-xs text-white uppercase tracking-wider">
             {title}
           </h4>
           <div className="flex items-center gap-3">
             {series.map((s) => (
-              <div key={s.name} className="flex items-center gap-1.5 text-[11px] font-space">
+              <div key={s.name} className="flex items-center gap-1.5 text-[11px] font-mono">
                 <span
-                  className="w-2.5 h-2.5 rounded-full shadow-[0_0_6px_currentColor]"
-                  style={{ backgroundColor: s.color, color: s.color }}
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: s.color }}
                 />
-                <span className="text-slate-400">{s.name}:</span>
+                <span className="text-zinc-400">{s.name}:</span>
                 <strong className="text-white font-bold">
                   {s.data[s.data.length - 1] ?? 0}
                   {s.unit}
@@ -64,14 +64,14 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
                     y1={y}
                     x2={width - padding.right}
                     y2={y}
-                    stroke="rgba(255, 255, 255, 0.08)"
-                    strokeDasharray="3 3"
+                    stroke="rgba(255, 255, 255, 0.05)"
+                    strokeDasharray="2 3"
                   />
                   <text
                     x={padding.left - 6}
                     y={y + 3}
                     textAnchor="end"
-                    fill="#64748b"
+                    fill="#71717a"
                     fontSize="9"
                     fontFamily="monospace"
                   >
@@ -97,11 +97,10 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
                   key={s.name}
                   fill="none"
                   stroke={s.color}
-                  strokeWidth="2.4"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   points={points}
-                  className="drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]"
                 />
               );
             })}
@@ -114,30 +113,30 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
   return (
     <div className="space-y-4">
       {/* Top Header */}
-      <div className="p-4 rounded-2xl hud-panel-pro flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-white/10">
+      <div className="p-4 rounded-2xl aegis-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border border-white/[0.08]">
         <div>
-          <div className="flex items-center gap-2.5">
-            <Activity className="w-5 h-5 text-cyan-400" />
-            <h2 className="font-space font-bold text-sm tracking-wide text-white">
+          <div className="flex items-baseline gap-2.5">
+            <span className="editorial-num">02.</span>
+            <h2 className="font-syne font-bold text-xs tracking-wider uppercase text-zinc-100">
               High-Frequency Subsystem Telemetry Analytics
             </h2>
           </div>
-          <p className="text-xs text-slate-400 font-space mt-0.5">
+          <p className="text-xs text-zinc-500 font-mono mt-0.5">
             Multi-vector time-series trend analysis buffer over the last 60 simulation cycles.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 font-space text-xs">
-          <span className="px-2.5 py-1 rounded-lg bg-black/60 border border-white/10 text-cyan-300">
+        <div className="flex items-center gap-2 font-mono text-xs">
+          <span className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-white/10 text-zinc-300">
             Buffer: {history.length} pts
           </span>
-          <span className="px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 font-bold">
+          <span className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-white/10 text-zinc-300 font-bold">
             Sampling: 1000ms
           </span>
         </div>
       </div>
 
-      {/* 2x2 Grid of In-Depth Subsystem Charts */}
+      {/* 2x2 Grid of Subsystem Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Chart 1: Power Dynamics */}
         {renderMultiChart(
@@ -145,13 +144,13 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
             {
               name: 'Battery SOC',
               data: recentHistory.map((h) => Number(h.battery.toFixed(1))),
-              color: '#00e5ff',
+              color: '#ffffff',
               unit: '%',
             },
             {
               name: 'Solar Eff.',
               data: recentHistory.map((h) => Number(h.solar.toFixed(1))),
-              color: '#eab308',
+              color: '#f59e0b',
               unit: '%',
             },
           ],
@@ -166,7 +165,7 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
             {
               name: 'Motors',
               data: recentHistory.map((h) => Number(h.temperature.toFixed(1))),
-              color: '#f97316',
+              color: '#fb923c',
               unit: '°C',
             },
           ],
@@ -181,13 +180,13 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
             {
               name: 'Traverse Speed',
               data: recentHistory.map((h) => Number((h.speed * 100).toFixed(1))),
-              color: '#10b981',
+              color: '#e4e4e7',
               unit: 'cm/s',
             },
             {
               name: 'Avg Slip',
               data: recentHistory.map((h) => Number((h.wheelSlip * 100).toFixed(0))),
-              color: '#ef4444',
+              color: '#f87171',
               unit: '%',
             },
           ],
@@ -202,7 +201,7 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
             {
               name: 'Mission Risk Score',
               data: recentHistory.map((h) => h.riskScore),
-              color: '#a855f7',
+              color: '#c084fc',
               unit: 'pts',
             },
           ],
@@ -213,13 +212,13 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
       </div>
 
       {/* Numerical Subsystem Summary Table */}
-      <div className="p-4 rounded-2xl hud-panel-pro shadow-xl border border-white/10 overflow-x-auto">
-        <h3 className="font-space font-semibold text-xs text-white tracking-wide mb-3">
+      <div className="p-4 rounded-2xl aegis-card border border-white/[0.08] overflow-x-auto">
+        <h3 className="font-syne font-bold text-xs text-white uppercase tracking-wider mb-3">
           Instantaneous Sensor Telemetry Summary Matrix
         </h3>
-        <table className="w-full text-left text-xs font-space border-collapse">
+        <table className="w-full text-left text-xs font-mono border-collapse">
           <thead>
-            <tr className="border-b border-white/10 text-slate-400 text-[11px]">
+            <tr className="border-b border-white/[0.08] text-zinc-500 text-[11px] uppercase tracking-wider">
               <th className="py-2.5 px-3">Subsystem Metric</th>
               <th className="py-2.5 px-3">Current Value</th>
               <th className="py-2.5 px-3">Nominal Range</th>
@@ -228,41 +227,41 @@ export const TelemetryAnalyticsView: React.FC<TelemetryAnalyticsViewProps> = ({
           </thead>
           <tbody className="divide-y divide-white/5">
             <tr>
-              <td className="py-2.5 px-3 text-slate-300 font-semibold">Battery State of Charge</td>
-              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.batteryLevel.toFixed(1)}% ({telemetry.batteryVoltage}V)</td>
-              <td className="py-2.5 px-3 text-slate-400">&gt; 25% (Critical: &lt; 15%)</td>
+              <td className="py-2.5 px-3 text-zinc-300 font-semibold">Battery State of Charge</td>
+              <td className="py-2.5 px-3 text-white font-bold">{telemetry.batteryLevel.toFixed(1)}% ({telemetry.batteryVoltage}V)</td>
+              <td className="py-2.5 px-3 text-zinc-400">&gt; 25% (Critical: &lt; 15%)</td>
               <td className="py-2.5 px-3">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.batteryLevel > 25 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400 animate-pulse'}`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${telemetry.batteryLevel > 25 ? 'bg-zinc-900 text-zinc-300 border border-white/10' : 'bg-red-950/80 text-red-300 border border-red-500/40'}`}>
                   {telemetry.batteryLevel > 25 ? 'Nominal' : 'Warning'}
                 </span>
               </td>
             </tr>
             <tr>
-              <td className="py-2.5 px-3 text-slate-300 font-semibold">Drive Motor Temperature</td>
-              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.motorAverageTemp.toFixed(1)}°C</td>
-              <td className="py-2.5 px-3 text-slate-400">-40°C to +50°C (Limit: 68°C)</td>
+              <td className="py-2.5 px-3 text-zinc-300 font-semibold">Drive Motor Temperature</td>
+              <td className="py-2.5 px-3 text-white font-bold">{telemetry.motorAverageTemp.toFixed(1)}°C</td>
+              <td className="py-2.5 px-3 text-zinc-400">-40°C to +50°C (Limit: 68°C)</td>
               <td className="py-2.5 px-3">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.motorAverageTemp < 50 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-amber-950/80 text-amber-400'}`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${telemetry.motorAverageTemp < 50 ? 'bg-zinc-900 text-zinc-300 border border-white/10' : 'bg-amber-950/80 text-amber-300 border border-amber-500/40'}`}>
                   {telemetry.motorAverageTemp < 50 ? 'Nominal' : 'High'}
                 </span>
               </td>
             </tr>
             <tr>
-              <td className="py-2.5 px-3 text-slate-300 font-semibold">Rocker-Bogie Wheel Slip</td>
-              <td className="py-2.5 px-3 text-cyan-300 font-bold">{(telemetry.wheelSlipAverage * 100).toFixed(0)}%</td>
-              <td className="py-2.5 px-3 text-slate-400">&lt; 35% (Stall: &gt; 60%)</td>
+              <td className="py-2.5 px-3 text-zinc-300 font-semibold">Rocker-Bogie Wheel Slip</td>
+              <td className="py-2.5 px-3 text-white font-bold">{(telemetry.wheelSlipAverage * 100).toFixed(0)}%</td>
+              <td className="py-2.5 px-3 text-zinc-400">&lt; 35% (Stall: &gt; 60%)</td>
               <td className="py-2.5 px-3">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.wheelSlipAverage < 0.35 ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400'}`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${telemetry.wheelSlipAverage < 0.35 ? 'bg-zinc-900 text-zinc-300 border border-white/10' : 'bg-red-950/80 text-red-300 border border-red-500/40'}`}>
                   {telemetry.wheelSlipAverage < 0.35 ? 'Traction OK' : 'Slip Critical'}
                 </span>
               </td>
             </tr>
             <tr>
-              <td className="py-2.5 px-3 text-slate-300 font-semibold">Relay Comm Signal</td>
-              <td className="py-2.5 px-3 text-cyan-300 font-bold">{telemetry.signalStrengthDbm} dBm ({telemetry.packetLossPercent}% loss)</td>
-              <td className="py-2.5 px-3 text-slate-400">&gt; -92 dBm (LOS: &lt; -108 dBm)</td>
+              <td className="py-2.5 px-3 text-zinc-300 font-semibold">Relay Comm Signal</td>
+              <td className="py-2.5 px-3 text-white font-bold">{telemetry.signalStrengthDbm} dBm ({telemetry.packetLossPercent}% loss)</td>
+              <td className="py-2.5 px-3 text-zinc-400">&gt; -92 dBm (LOS: &lt; -108 dBm)</td>
               <td className="py-2.5 px-3">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${telemetry.relayConnected ? 'bg-emerald-950/60 text-emerald-400' : 'bg-red-950/80 text-red-400'}`}>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${telemetry.relayConnected ? 'bg-zinc-900 text-zinc-300 border border-white/10' : 'bg-red-950/80 text-red-300 border border-red-500/40'}`}>
                   {telemetry.relayConnected ? 'Locked' : 'LOS'}
                 </span>
               </td>

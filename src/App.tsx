@@ -6,8 +6,10 @@ import { DecisionLog } from './components/DecisionLog';
 import { HazardMatrixModal } from './components/HazardMatrixModal';
 import { Header } from './components/Header';
 import { MissionMap } from './components/MissionMap';
+import { RealtimeScenarioPanel } from './components/RealtimeScenarioPanel';
 import { RiskBanner } from './components/RiskBanner';
 import { ScenarioController } from './components/ScenarioController';
+import { SpaceBackground } from './components/SpaceBackground';
 import { TelemetryAnalyticsView } from './components/TelemetryAnalyticsView';
 import { TelemetryCards } from './components/TelemetryCards';
 import { AegisAIAssistant } from './engines/aiAssistantEngine';
@@ -432,7 +434,10 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#04060b] bg-space-dark text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-transparent text-zinc-100 flex flex-col font-sans selection:bg-white/20 relative">
+      {/* Subtle Animated Space Background: Rotating Mars & Layered Starfield */}
+      <SpaceBackground />
+
       {/* Flight Control Deck Top Header Bar */}
       <Header
         telemetry={telemetry}
@@ -448,20 +453,25 @@ export function App() {
       />
 
       {/* Main Mission Operations Center Content Area */}
-      <main className="flex-1 max-w-[1480px] w-full mx-auto px-4 py-4 space-y-4">
+      <main className="flex-1 max-w-[1520px] w-full mx-auto px-4 lg:px-6 py-3 space-y-3.5">
         {/* Dynamic Compounding Risk Assessment Banner (Global across views for mission flight safety) */}
-        <RiskBanner risk={riskAssessment} activeHazardCount={activeHazards.length} />
+        <RiskBanner
+          risk={riskAssessment}
+          activeHazardCount={activeHazards.length}
+          missionName={availableMissions.find(m => m.id === activeMissionId)?.name || 'Jezero Primary Exploration'}
+          currentObjective="Transit to Waypoint 2 (Mid-Valley Crater)"
+          operationalMode={telemetry.operationalMode}
+        />
 
-        {/* Tab 1: DASHBOARD (Main Flight Operations Console) */}
+        {/* Tab 1: DASHBOARD (Main Flight Operations Console - Clean Vertical Flow) */}
         {activeTab === 'DASHBOARD' && (
-          <div className="space-y-4">
-            {/* Live Subsystem Telemetry Cards & Blueprint */}
+          <div className="space-y-3.5">
+            {/* 1. Subsystem Telemetry Vitals */}
             <TelemetryCards telemetry={telemetry} history={telemetryHistory} />
 
-            {/* Tactical Reconnaissance Map & Real-Time Hazard/Decision Feed */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-              {/* Tactical Surface Map (7 Columns) */}
-              <div className="lg:col-span-7 h-[440px]">
+            {/* 2 & 3. Tactical Terrain Map (~55%) & Real-Time Scenario Monitor (~45%) Side-by-Side matching reference */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+              <div className="lg:col-span-7 flex flex-col min-h-[290px]">
                 <MissionMap
                   telemetry={telemetry}
                   trail={backendTrail.length > 0 ? backendTrail : simModelRef.current.getTrail()}
@@ -469,26 +479,38 @@ export function App() {
                 />
               </div>
 
-              {/* Active 9-Vector Hazards Panel & Real-Time Decision Stream (5 Columns) */}
-              <div className="lg:col-span-5 flex flex-col gap-4">
-                <div className="flex-1 min-h-[220px]">
-                  <ActiveHazardsPanel
-                    hazards={activeHazards}
-                    onExecuteMitigation={handleExecuteMitigation}
-                    onOpenMatrix={() => setIsMatrixOpen(true)}
-                  />
-                </div>
-                <div className="flex-1 min-h-[200px]">
-                  <DecisionLog
-                    logs={logs}
-                    recentDecision={recentDecision}
-                    onClearLogs={() => setLogs([])}
-                  />
-                </div>
+              <div className="lg:col-span-5 flex flex-col min-h-[290px]">
+                <RealtimeScenarioPanel
+                  activeScenarioId={activeScenarioId}
+                  isRunning={isRunning}
+                  telemetry={telemetry}
+                  activeHazards={activeHazards}
+                  riskAssessment={riskAssessment}
+                  backendConnected={backendConnected}
+                  onClearFaults={handleClearFaults}
+                />
               </div>
             </div>
 
-            {/* Scenario Simulator & Anomaly Injection Matrix */}
+            {/* 4. Hazard Detection & Autonomous Decisions (Balanced Side-by-Side) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+              <div className="min-h-[340px]">
+                <ActiveHazardsPanel
+                  hazards={activeHazards}
+                  onExecuteMitigation={handleExecuteMitigation}
+                  onOpenMatrix={() => setIsMatrixOpen(true)}
+                />
+              </div>
+              <div className="min-h-[340px]">
+                <DecisionLog
+                  logs={logs}
+                  recentDecision={recentDecision}
+                  onClearLogs={() => setLogs([])}
+                />
+              </div>
+            </div>
+
+            {/* 5. Scenario Simulator & Controls */}
             <ScenarioController
               isRunning={isRunning}
               onTogglePlay={handleTogglePlay}
@@ -501,6 +523,118 @@ export function App() {
               onInjectScenario={handleInjectScenario}
               onClearFaults={handleClearFaults}
             />
+
+            {/* 6. Further Down — Advanced Mission Intelligence Features Hub */}
+            <div className="rounded-2xl aegis-card p-5 border border-white/[0.08]">
+              <div className="flex items-baseline justify-between pb-3 mb-4 border-b border-white/[0.08]">
+                <div className="flex items-baseline gap-2.5">
+                  <span className="editorial-num">06.</span>
+                  <h3 className="font-syne font-bold text-xs tracking-wider uppercase text-zinc-100">
+                    Advanced Mission Intelligence & Engineering Tools
+                  </h3>
+                </div>
+                <span className="text-[10px] font-mono text-zinc-500 hidden sm:inline">
+                  Deep Inspection & Subsystem Teleoperation
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 font-mono text-xs">
+                {/* 1. Telemetry Analytics */}
+                <button
+                  onClick={() => handleTabChange('TELEMETRY')}
+                  className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-left border border-white/5 hover:border-white/20 transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-bold mb-1">01 / ANALYTICS</div>
+                    <div className="font-syne font-bold text-zinc-200 group-hover:text-white uppercase text-xs">
+                      Telemetry Graphs
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-sans mt-1">
+                      Multi-axis time-series trend analysis across 60 cycles.
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[10px] text-zinc-400 font-bold group-hover:text-zinc-200">
+                    Open Analytics →
+                  </div>
+                </button>
+
+                {/* 2. Tactical Map Focus */}
+                <button
+                  onClick={() => handleTabChange('MAP')}
+                  className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-left border border-white/5 hover:border-white/20 transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-bold mb-1">02 / TERRAIN</div>
+                    <div className="font-syne font-bold text-zinc-200 group-hover:text-white uppercase text-xs">
+                      Expanded Map
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-sans mt-1">
+                      Full-viewport DEM surface reconnaissance & contour zoom.
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[10px] text-zinc-400 font-bold group-hover:text-zinc-200">
+                    Inspect Map →
+                  </div>
+                </button>
+
+                {/* 3. AI Assistant */}
+                <button
+                  onClick={() => handleTabChange('ASSISTANT')}
+                  className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-left border border-white/5 hover:border-white/20 transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-bold mb-1">03 / AI ADVICE</div>
+                    <div className="font-syne font-bold text-zinc-200 group-hover:text-white uppercase text-xs">
+                      AEGIS-Core AI
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-sans mt-1">
+                      Query rover safety, battery discharge, and stuck recovery.
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[10px] text-zinc-400 font-bold group-hover:text-zinc-200">
+                    Launch Assistant →
+                  </div>
+                </button>
+
+                {/* 4. Hazard Rules Matrix */}
+                <button
+                  onClick={() => setIsMatrixOpen(true)}
+                  className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-left border border-white/5 hover:border-white/20 transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-bold mb-1">04 / RULES</div>
+                    <div className="font-syne font-bold text-zinc-200 group-hover:text-white uppercase text-xs">
+                      9-Vector Matrix
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-sans mt-1">
+                      Inspect rule thresholds and toggle autonomous mitigations.
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[10px] text-zinc-400 font-bold group-hover:text-zinc-200">
+                    Open Matrix →
+                  </div>
+                </button>
+
+                {/* 5. Autonomy Benchmark */}
+                <button
+                  onClick={() => setIsBenchmarkOpen(true)}
+                  className="p-3.5 rounded-xl bg-zinc-900/60 hover:bg-zinc-800 text-left border border-white/5 hover:border-white/20 transition-all group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="text-[10px] text-zinc-500 font-bold mb-1">05 / BENCHMARK</div>
+                    <div className="font-syne font-bold text-zinc-200 group-hover:text-white uppercase text-xs">
+                      Benchmark Suite
+                    </div>
+                    <div className="text-[11px] text-zinc-500 font-sans mt-1">
+                      Compare edge autonomy vs Earth teleoperation across 100 runs.
+                    </div>
+                  </div>
+                  <div className="mt-3 text-[10px] text-zinc-400 font-bold group-hover:text-zinc-200">
+                    Run Comparison →
+                  </div>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -595,21 +729,21 @@ export function App() {
       </main>
 
       {/* Flight Control Deck Status Footer */}
-      <footer className="border-t border-white/5 bg-[#03050a] py-2.5 px-4 text-[11px] font-space text-slate-500">
+      <footer className="border-t border-white/[0.06] bg-[#07070a]/90 backdrop-blur-md py-3 px-4 text-[11px] font-mono text-zinc-500">
         <div className="max-w-[1480px] mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981]" />
-            <span className="text-slate-400 font-semibold">AEGIS Flight System Integrity: 100% Nominal</span>
-            <span className="text-slate-700">|</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-200" />
+            <span className="text-zinc-400 font-medium">AEGIS Flight System Integrity: 100% Nominal</span>
+            <span className="text-zinc-700">/</span>
             <span>Autonomy Engine v4.2</span>
           </div>
 
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-4 text-zinc-500">
             <span>Coords: {telemetry.position.x}E, {telemetry.position.y}N</span>
-            <span className="text-slate-700">|</span>
+            <span className="text-zinc-700">/</span>
             <span>Battery: {telemetry.batteryLevel.toFixed(1)}% ({telemetry.batteryVoltage}V)</span>
-            <span className="text-slate-700">|</span>
-            <span className="text-cyan-400 font-semibold">Jezero Crater Sector 4</span>
+            <span className="text-zinc-700">/</span>
+            <span className="text-zinc-300 font-semibold">Jezero Crater Sector 4</span>
           </div>
         </div>
       </footer>

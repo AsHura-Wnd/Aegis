@@ -26,32 +26,30 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
   const getSeverityStyle = (sev: string) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-red-500/20 text-red-300 border-red-500/60 shadow-[0_0_10px_rgba(239,68,68,0.4)] animate-pulse';
+        return 'bg-red-500/15 text-red-300 border-red-500/40';
       case 'HIGH':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.3)]';
+        return 'bg-amber-500/15 text-amber-300 border-amber-500/40';
       case 'MODERATE':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50';
+        return 'bg-yellow-500/15 text-yellow-300 border-yellow-500/40';
       default:
-        return 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50';
+        return 'bg-zinc-800 text-zinc-300 border-white/10';
     }
   };
 
   return (
-    <div className="rounded-2xl hud-panel-pro p-4 shadow-xl flex flex-col h-full border border-white/10">
+    <div className="rounded-2xl aegis-card p-4 flex flex-col h-full border border-white/[0.08]">
       {/* Panel Header */}
-      <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
-        <div className="flex items-center gap-2.5">
-          <div className="relative">
-            <ShieldAlert className={`w-4 h-4 ${hazards.length > 0 ? 'text-red-400 animate-pulse' : 'text-cyan-400'}`} />
-          </div>
-          <h3 className="font-space font-semibold text-xs tracking-wider text-white">
+      <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.08]">
+        <div className="flex items-baseline gap-2.5">
+          <span className="editorial-num">03.</span>
+          <h3 className="font-syne font-bold text-xs tracking-wider uppercase text-zinc-100">
             9-Vector Hazard Detection Engine
           </h3>
           <span
-            className={`text-[10px] font-space px-2 py-0.5 rounded-full font-bold ${
+            className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase ${
               hazards.length > 0
-                ? 'bg-red-500/20 text-red-300 border border-red-500/40 shadow-[0_0_8px_rgba(239,68,68,0.4)]'
-                : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                ? 'bg-red-950/80 text-red-300 border border-red-500/40'
+                : 'bg-zinc-900 text-zinc-400 border border-white/10'
             }`}
           >
             {hazards.length} Active
@@ -63,7 +61,7 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
             soundFX.playClick();
             onOpenMatrix();
           }}
-          className="text-[11px] font-space text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5 transition-colors font-semibold"
+          className="text-[11px] font-mono text-zinc-400 hover:text-zinc-100 flex items-center gap-1.5 transition-colors font-medium"
         >
           <Layers className="w-3.5 h-3.5" /> View 9 Rules Matrix
         </button>
@@ -72,15 +70,14 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
       {/* Hazards List */}
       <div className="flex-1 overflow-y-auto space-y-2.5 max-h-[360px] pr-1">
         {hazards.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-9 text-center bg-[#060912]/80 rounded-xl border border-dashed border-emerald-500/30 p-5 shadow-inner">
-            <div className="relative mb-3">
-              <ShieldCheck className="w-12 h-12 text-emerald-400 opacity-90 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]" />
-              <div className="absolute inset-0 rounded-full bg-emerald-400/10 animate-ping" />
+          <div className="flex flex-col items-center justify-center py-8 text-center bg-zinc-900/30 rounded-xl border border-dashed border-white/10 p-5">
+            <div className="mb-2.5">
+              <ShieldCheck className="w-10 h-10 text-zinc-400" />
             </div>
-            <h4 className="font-space font-bold text-sm text-emerald-300 tracking-wide">
+            <h4 className="font-syne font-bold text-sm text-zinc-200 tracking-wide uppercase">
               All Systems Nominal
             </h4>
-            <p className="text-xs text-slate-400 max-w-sm mt-1.5 font-rajdhani leading-relaxed">
+            <p className="text-xs text-zinc-500 max-w-sm mt-1 font-mono leading-relaxed">
               All 9 continuous hazard vectors (Battery, Overheating, Cold, Wheel Slip, Stuck, Solar Dust, Weak Comm, Dangerous Terrain, Power Drain) are within acceptable thresholds.
             </p>
           </div>
@@ -88,26 +85,26 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
           hazards.map((h) => (
             <div
               key={h.id}
-              className={`p-3.5 rounded-xl border transition-all shadow-md ${
+              className={`p-3.5 rounded-xl border transition-all ${
                 h.severity === 'CRITICAL'
-                  ? 'border-red-500/60 bg-red-950/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
-                  : 'border-amber-500/50 bg-[#101422]'
+                  ? 'border-red-500/50 bg-red-950/20'
+                  : 'border-amber-500/40 bg-amber-950/15'
               }`}
             >
               {/* Header: Name & Severity */}
-              <div className="flex items-center justify-between gap-2 mb-1.5">
+              <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <AlertTriangle
                     className={`w-4 h-4 ${
                       h.severity === 'CRITICAL' ? 'text-red-400 animate-pulse' : 'text-amber-400'
                     }`}
                   />
-                  <span className="font-mono font-bold text-xs text-slate-100 tracking-wide">
+                  <span className="font-mono font-bold text-xs text-zinc-100 tracking-wide uppercase">
                     {h.hazardName}
                   </span>
                 </div>
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded border font-bold ${getSeverityStyle(
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded border font-bold uppercase ${getSeverityStyle(
                     h.severity
                   )}`}
                 >
@@ -116,7 +113,7 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
               </div>
 
               {/* Reason for detection */}
-              <p className="text-xs text-slate-300 font-sans leading-relaxed mb-2.5">
+              <p className="text-xs text-zinc-300 font-sans leading-relaxed mb-2.5">
                 {h.reason}
               </p>
 
@@ -125,20 +122,20 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
                 {h.relevantTelemetry.map((t, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/60 border border-white/10 text-[10px] font-mono"
+                    className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/60 border border-white/[0.08] text-[10px] font-mono"
                   >
-                    <span className="text-slate-400">{t.label}:</span>
-                    <strong className="text-cyan-300 font-semibold">{t.value}</strong>
-                    <span className="text-slate-500 text-[9px]">({t.threshold})</span>
+                    <span className="text-zinc-500">{t.label}:</span>
+                    <strong className="text-zinc-200 font-semibold">{t.value}</strong>
+                    <span className="text-zinc-600 text-[9px]">({t.threshold})</span>
                   </div>
                 ))}
               </div>
 
               {/* Recommended Action & Mitigation button */}
-              <div className="pt-2.5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <div className="text-[11px] text-amber-200/90 font-sans leading-tight">
-                  <span className="font-semibold text-amber-400 font-space text-[11px] tracking-wide">
-                    Recommended Action:
+              <div className="pt-2.5 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div className="text-[11px] text-zinc-400 font-sans leading-tight">
+                  <span className="font-semibold text-zinc-200 font-mono text-[11px] uppercase tracking-wide">
+                    Action:
                   </span>{' '}
                   {h.recommendedAction}
                 </div>
@@ -148,7 +145,7 @@ export const ActiveHazardsPanel: React.FC<ActiveHazardsPanelProps> = ({
                     soundFX.playSuccess();
                     onExecuteMitigation(h);
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 shadow-[0_0_10px_rgba(0,229,255,0.2)] text-[11px] font-mono font-bold flex items-center gap-1.5 shrink-0 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-black text-[11px] font-mono font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-sm"
                 >
                   <Wrench className="w-3.5 h-3.5" /> Execute Mitigation
                 </button>

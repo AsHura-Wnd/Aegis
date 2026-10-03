@@ -117,29 +117,26 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   };
 
   return (
-    <div className="rounded-2xl hud-panel-pro p-4 md:p-5 shadow-2xl flex flex-col h-full border border-white/10">
+    <div className="rounded-2xl aegis-card p-4 md:p-5 flex flex-col h-full border border-white/[0.08]">
       {/* Assistant Header */}
-      <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10">
+      <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/[0.08]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-cyan-300 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-            <Bot className="w-5 h-5 text-cyan-400" />
+          <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-300">
+            <Bot className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-space font-semibold text-xs tracking-wider text-white">
+            <div className="flex items-baseline gap-2">
+              <span className="editorial-num text-xs">03.</span>
+              <h3 className="font-syne font-bold text-xs tracking-wider uppercase text-zinc-100">
                 AEGIS-Core Mission Intelligence
               </h3>
               <span
-                className={`text-[9px] font-space px-2 py-0.5 rounded-full border font-semibold ${
-                  assistant.getApiKey()
-                    ? 'bg-purple-950/60 text-purple-300 border-purple-500/40 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
-                    : 'bg-cyan-950/60 text-cyan-300 border-cyan-500/40 shadow-[0_0_8px_rgba(0,229,255,0.2)]'
-                }`}
+                className="text-[9px] font-mono px-2 py-0.5 rounded-full border border-white/10 bg-zinc-900 text-zinc-400 font-semibold"
               >
                 {assistant.getApiKey() ? 'Gemini 1.5 Hybrid' : 'Deterministic Rules Engine'}
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 font-space mt-0.5">
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
               Live State: {telemetry.formattedTime} | {risk.riskLevel} Risk ({risk.currentScore}/100)
             </p>
           </div>
@@ -150,10 +147,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             soundFX.playClick();
             setShowKeyModal(true);
           }}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 hover:border-cyan-500/40 text-xs font-mono flex items-center gap-1.5 transition-all font-semibold"
+          className="px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 hover:border-white/20 text-xs font-mono flex items-center gap-1.5 transition-all font-medium"
           title="Configure optional Gemini LLM API Key"
         >
-          <Key className="w-3.5 h-3.5 text-cyan-400" />
+          <Key className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">LLM Key</span>
         </button>
       </div>
@@ -164,7 +161,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           <button
             key={qp.id}
             onClick={() => handleSend(qp.query)}
-            className="px-3 py-1 rounded-full bg-cyan-950/40 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shrink-0 transition-all shadow-sm hover:shadow-[0_0_10px_rgba(0,229,255,0.2)] font-semibold"
+            className="px-3 py-1 rounded-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 hover:border-white/25 shrink-0 transition-all font-medium"
           >
             {qp.label}
           </button>
@@ -183,8 +180,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               <div
                 className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
                   isUser
-                    ? 'bg-blue-600/30 border-blue-400/50 text-blue-300'
-                    : 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300'
+                    ? 'bg-zinc-800 border-white/20 text-white'
+                    : 'bg-zinc-900 border-white/10 text-zinc-300'
                 }`}
               >
                 {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
@@ -193,12 +190,12 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               <div
                 className={`max-w-[85%] rounded-xl p-3 text-xs leading-relaxed ${
                   isUser
-                    ? 'bg-blue-950/40 border border-blue-500/40 text-blue-100 rounded-tr-none'
-                    : 'bg-[#080d1a] border border-cyan-500/30 text-slate-200 rounded-tl-none shadow-md'
+                    ? 'bg-zinc-800 border border-white/10 text-zinc-100 rounded-tr-none'
+                    : 'bg-zinc-900/80 border border-white/[0.08] text-zinc-300 rounded-tl-none'
                 }`}
               >
-                <div className="flex items-center justify-between gap-3 mb-1 text-[10px] font-space text-slate-400 pb-1 border-b border-white/5">
-                  <span className="font-semibold text-slate-300">
+                <div className="flex items-center justify-between gap-3 mb-1 text-[10px] font-mono text-zinc-500 pb-1 border-b border-white/5">
+                  <span className="font-semibold text-zinc-300">
                     {isUser ? 'Flight Operator' : 'AEGIS Autonomy'}
                   </span>
                   <span>{msg.timestamp}</span>
@@ -210,8 +207,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         })}
 
         {isLoading && (
-          <div className="flex items-center gap-2 p-3 bg-[#080d1a] rounded-xl border border-cyan-500/30 text-xs font-space text-cyan-300 max-w-xs animate-pulse">
-            <Sparkles className="w-4 h-4 animate-spin text-cyan-400" />
+          <div className="flex items-center gap-2 p-3 bg-zinc-900/60 rounded-xl border border-white/10 text-xs font-mono text-zinc-400 max-w-xs animate-pulse">
+            <Sparkles className="w-4 h-4 animate-spin text-zinc-300" />
             Synthesizing deterministic mission advice...
           </div>
         )}
@@ -224,22 +221,22 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
           e.preventDefault();
           handleSend();
         }}
-        className="mt-3 pt-3 border-t border-white/10 flex items-center gap-2"
+        className="mt-3 pt-3 border-t border-white/[0.08] flex items-center gap-2"
       >
         <div className="relative flex-1">
-          <Terminal className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Terminal className="w-4 h-4 text-zinc-600 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
             placeholder="Ask AEGIS-Core: e.g. 'What is the current wheel slip and slope?'"
-            className="w-full bg-[#060810] border border-white/10 focus:border-cyan-400 rounded-xl pl-9 pr-3 py-2 text-xs font-space text-slate-100 focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all"
+            className="w-full bg-zinc-900/80 border border-white/10 focus:border-white/30 rounded-xl pl-9 pr-3 py-2 text-xs font-mono text-zinc-100 focus:outline-none transition-all placeholder:text-zinc-600"
           />
         </div>
         <button
           type="submit"
           disabled={!inputQuery.trim() || isLoading}
-          className="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-40 text-black font-space font-bold text-xs flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(0,229,255,0.3)] shrink-0"
+          className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white disabled:opacity-40 text-black font-mono font-bold text-xs flex items-center gap-1.5 transition-all shrink-0"
         >
           <Send className="w-3.5 h-3.5" />
           <span>Ask</span>
@@ -248,12 +245,12 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
 
       {/* Optional Gemini API Key Modal */}
       {showKeyModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0b101d] border border-cyan-500/40 rounded-2xl max-w-md w-full p-5 shadow-2xl">
-            <h3 className="font-space font-bold text-sm text-white mb-1">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0c0c11] border border-white/10 rounded-2xl max-w-md w-full p-5 aegis-card shadow-2xl">
+            <h3 className="font-syne font-bold text-sm text-white mb-1 uppercase">
               Configure Gemini API Key (Optional)
             </h3>
-            <p className="text-xs text-slate-400 mb-3 font-sans">
+            <p className="text-xs text-zinc-400 mb-3 font-sans">
               AEGIS runs 100% offline with zero external dependencies using its deterministic rules engine. You may optionally enter a Google Gemini API key for freeform hybrid conversational explanations.
             </p>
             <input
@@ -261,20 +258,20 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
               value={apiKeyInput}
               onChange={(e) => setApiKeyInput(e.target.value)}
               placeholder="AIzaSy..."
-              className="w-full bg-black/60 border border-white/10 rounded-lg p-2.5 text-xs font-mono text-white mb-4 focus:outline-none focus:border-cyan-400"
+              className="w-full bg-zinc-900 border border-white/10 rounded-lg p-2.5 text-xs font-mono text-white mb-4 focus:outline-none focus:border-white/30"
             />
             <div className="flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setShowKeyModal(false)}
-                className="px-3 py-1.5 text-xs font-mono text-slate-400 hover:text-white"
+                className="px-3 py-1.5 text-xs font-mono text-zinc-400 hover:text-white"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSaveApiKey}
-                className="px-4 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-black rounded-lg text-xs font-mono font-bold"
+                className="px-4 py-1.5 bg-zinc-100 hover:bg-white text-black rounded-lg text-xs font-mono font-bold"
               >
                 Save Key
               </button>

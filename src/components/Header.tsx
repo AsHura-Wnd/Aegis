@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { OperationalMode, RoverTelemetry } from '../types/telemetry';
 import { soundFX } from '../utils/audio';
+import { WolfLogo } from './WolfLogo';
 import {
   Activity,
   BarChart3,
   Bot,
   Compass,
-  Cpu,
+  Crosshair,
   Globe,
   Layers,
   MapPin,
   Radio,
-  Satellite,
   Shield,
   Volume2,
   VolumeX,
@@ -53,196 +53,201 @@ export const Header: React.FC<HeaderProps> = ({
   const getModeBadge = (mode: OperationalMode) => {
     switch (mode) {
       case 'EMERGENCY_RECOVERY':
-        return 'bg-red-500/20 text-red-300 border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.4)] animate-pulse';
+        return 'bg-rose-950/60 text-rose-300 border-rose-500/40 shadow-sm';
       case 'SAFE_HOLD':
-        return 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.3)]';
+        return 'bg-amber-950/60 text-amber-300 border-amber-500/40 shadow-sm';
       case 'RECHARGE_STANDBY':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/60 shadow-[0_0_15px_rgba(234,179,8,0.3)]';
+        return 'bg-yellow-950/60 text-yellow-300 border-yellow-500/40 shadow-sm';
       case 'HAZARD_AVOIDANCE':
-        return 'bg-purple-500/20 text-purple-300 border-purple-500/60 shadow-[0_0_15px_rgba(168,85,247,0.3)]';
+        return 'bg-purple-950/60 text-purple-300 border-purple-500/40 shadow-sm';
       case 'AUTONOMOUS_TRANSIT':
       default:
-        return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-[0_0_15px_rgba(0,229,255,0.25)]';
+        return 'bg-zinc-900/90 text-zinc-100 border-white/15 shadow-sm';
     }
   };
 
   return (
-    <header className="border-b border-cyan-500/20 bg-[#04060d]/95 backdrop-blur-xl sticky top-0 z-40 shadow-2xl">
-      {/* Top Aerospace Command Bar */}
-      <div className="max-w-[1440px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
-        {/* Left: Mission Crest & Tactical ID */}
-        <div className="flex items-center gap-3.5">
-          <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/40 shadow-[0_0_20px_rgba(0,229,255,0.3)]">
-            <Shield className="w-5 h-5 text-cyan-400" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+    <header className="border-b border-white/[0.06] bg-black/30 backdrop-blur-md sticky top-0 z-40 transition-colors">
+      <div className="max-w-[1520px] mx-auto px-4 lg:px-6">
+        {/* Row 1: Brand & Flight Deck Status */}
+        <div className="py-2 flex flex-wrap items-center justify-between gap-2.5">
+          {/* Left: Brand Crest & Tactical Identification */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/5 border border-white/10 text-white transition-all hover:border-white/20 shrink-0">
+              <WolfLogo className="w-5 h-5" />
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-space font-extrabold text-lg tracking-[0.16em] text-white">
+                  AEGIS
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/10 tracking-widest font-medium">
+                  MARS 2026 // IIIT-D
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/10 tracking-widest font-medium hidden sm:inline">
+                  SOL 214 // SECTOR 4
+                </span>
+              </div>
+              <p className="text-[11px] font-sans text-zinc-400 tracking-normal hidden sm:block mt-0.5">
+                Autonomous Planetary Rover Mission-Intelligence & Safety Dashboard
+              </p>
+            </div>
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-orbitron font-extrabold text-lg tracking-wider text-white glow-cyan">
-                AEGIS
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 tracking-widest font-semibold">
-                MARS 2026 // IIIT-D
-              </span>
-              <span className="hidden xl:inline text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/10">
-                SOL 214 // SECTOR 4
+          {/* Right: Mission Clock, Mode & Target Waypoint */}
+          <div className="flex items-center gap-2.5 font-mono text-xs">
+            {/* Mission Elapsed Time (MET) */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 border border-white/10 shadow-inner">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.9)]" />
+              <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-wider">Clock:</span>
+              <span className="font-mono font-bold text-white tracking-wider text-xs">
+                {telemetry.formattedTime}
               </span>
             </div>
-            <p className="text-[11px] font-space text-slate-400 tracking-wide hidden sm:block">
-              Autonomous Planetary Rover Mission-Intelligence & Safety Dashboard
-            </p>
-          </div>
-        </div>
 
-        {/* Center: Flight Clock, Operational Mode & DSN Relay Status */}
-        <div className="flex items-center gap-2 sm:gap-4 font-mono text-xs">
-          {/* Mission Elapsed Time (MET) */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-[#070b14] border border-cyan-500/30 shadow-inner">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#10b981]" />
-            <span className="text-slate-400 text-[11px] font-semibold">Clock:</span>
-            <span className="font-space font-bold text-white tracking-wider text-xs">
-              {telemetry.formattedTime}
-            </span>
-          </div>
-
-          {/* Operational Mode Badge */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-slate-400 text-[11px] hidden md:inline font-mono">Mode:</span>
-            <span
-              className={`px-3 py-1 rounded-lg border font-space font-bold text-xs tracking-wide transition-all duration-300 ${getModeBadge(
-                telemetry.operationalMode
-              )}`}
-            >
-              {telemetry.operationalMode.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
-            </span>
-          </div>
-
-          {/* Current Target Objective */}
-          <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-slate-400 px-2.5 py-1 rounded-lg bg-black/40 border border-white/5">
-            <MapPin className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
-            <span className="truncate max-w-[210px] text-slate-300 font-rajdhani text-xs font-semibold">
-              {telemetry.currentObjective}
-            </span>
-          </div>
-        </div>
-
-        {/* Right: Quick Tools, Audio Toggle & Rules */}
-        <div className="flex items-center gap-2">
-          {/* Sound FX Toggle Button */}
-          <button
-            onClick={handleToggleSound}
-            className={`p-1.5 text-xs font-mono rounded-lg border transition-all ${
-              soundOn
-                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(0,229,255,0.2)]'
-                : 'bg-white/5 text-slate-500 border-white/10 hover:text-slate-300'
-            }`}
-            title={soundOn ? 'Tactical Audio Feedback ON (Click to Mute)' : 'Tactical Audio Feedback MUTED (Click to Enable)'}
-          >
-            {soundOn ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-
-          {/* 9-Vector Rules Matrix Modal Button */}
-          <button
-            onClick={() => {
-              soundFX.playClick();
-              onOpenMatrix();
-            }}
-            className="px-2.5 py-1 text-xs font-mono rounded-lg bg-white/5 hover:bg-cyan-500/10 text-slate-200 hover:text-cyan-300 border border-white/10 hover:border-cyan-500/30 flex items-center gap-1.5 transition-all shadow-sm"
-            title="Inspect 9 Hazard Rules Matrix"
-          >
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline font-semibold">Rules (9)</span>
-          </button>
-
-          {/* Autonomy Benchmark Comparison Modal Button */}
-          <button
-            onClick={() => {
-              soundFX.playClick();
-              onOpenBenchmark();
-            }}
-            className="px-2.5 py-1 text-xs font-mono rounded-lg bg-gradient-to-r from-cyan-500/20 to-blue-500/20 hover:from-cyan-500/30 hover:to-blue-500/30 text-cyan-200 border border-cyan-500/40 flex items-center gap-1.5 transition-all shadow-[0_0_12px_rgba(0,229,255,0.15)] font-semibold"
-            title="View Autonomy Benchmark Comparison (P2 Feature)"
-          >
-            <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline">Benchmark</span>
-          </button>
-
-          {/* Backend Connection Indicator */}
-          <span
-            className={`text-[10px] font-mono px-2 py-0.5 rounded border flex items-center gap-1.5 ${
-              backendConnected
-                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-            }`}
-            title={backendConnected ? 'Connected to AEGIS Backend REST API (Port 3001)' : 'Offline: Local Fallback Simulation'}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                backendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
-              }`}
-            />
-            <span className="hidden md:inline">{backendConnected ? 'API 3001: ONLINE' : 'API: LOCAL'}</span>
-            <span className="md:hidden">{backendConnected ? 'API' : 'LOCAL'}</span>
-          </span>
-
-          {/* Active Mission Switcher */}
-          {availableMissions.length > 0 && onSelectMission && (
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] font-mono text-slate-500 hidden xl:inline">MISSION:</span>
-              <select
-                value={activeMissionId}
-                onChange={(e) => {
-                  soundFX.playClick();
-                  onSelectMission(e.target.value);
-                }}
-                className="text-[10px] font-mono bg-black/60 text-cyan-300 border border-cyan-500/30 rounded px-1.5 py-0.5 focus:outline-none focus:border-cyan-400 cursor-pointer"
-                title="Switch Active Mission Instance"
+            {/* Operational Mode Badge */}
+            <div className="flex items-center gap-1.5">
+              <span className="text-zinc-400 text-[10px] hidden md:inline font-mono uppercase tracking-wider">Mode:</span>
+              <span
+                className={`px-3 py-1 rounded-full border font-space font-medium text-xs tracking-wider transition-all ${getModeBadge(
+                  telemetry.operationalMode
+                )}`}
               >
-                {availableMissions.map((m) => (
-                  <option key={m.id} value={m.id} className="bg-slate-900 text-slate-200">
-                    {m.id}
-                  </option>
-                ))}
-              </select>
+                {telemetry.operationalMode.split('_').map(w => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
+              </span>
             </div>
-          )}
 
-          <span className="text-[10px] font-mono text-slate-500 border border-white/5 px-2 py-1 rounded bg-black/50 hidden sm:inline">
-            SEED: {seed}
-          </span>
+            {/* Current Target Objective */}
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-zinc-300 px-3 py-1.5 rounded-full bg-black/60 border border-white/10">
+              <MapPin className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+              <span className="truncate max-w-[260px] font-sans">
+                {telemetry.currentObjective || 'Transit to Waypoint 5 (Science Primary)'}
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      {/* Futuristic Flight Deck Navigation Tabs */}
-      <div className="max-w-[1440px] mx-auto px-4 flex items-center gap-1 border-t border-white/5 overflow-x-auto">
-        {[
-          { id: 'DASHBOARD', label: 'Mission Overview', icon: Globe },
-          { id: 'MAP', label: 'Tactical Terrain Map', icon: Compass },
-          { id: 'TELEMETRY', label: 'Telemetry Analytics', icon: Activity },
-          { id: 'ASSISTANT', label: 'AEGIS-Core AI', icon: Bot },
-          { id: 'LOGS', label: 'Decision Stream', icon: Radio },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
+        {/* Row 2: Secondary Controls & Mission Configuration */}
+        <div className="py-2 flex items-center justify-between gap-3 border-t border-white/[0.05] flex-wrap">
+          <div className="flex items-center gap-2.5">
+            {/* Audio Feedback Button */}
             <button
-              key={tab.id}
+              onClick={handleToggleSound}
+              className={`p-2 text-xs font-mono rounded-xl border transition-all ${
+                soundOn
+                  ? 'bg-white/10 text-white border-white/20'
+                  : 'bg-black/50 text-zinc-400 border-white/10 hover:text-zinc-200 hover:border-white/20'
+              }`}
+              title={soundOn ? 'Tactical Audio Feedback ON (Click to Mute)' : 'Tactical Audio Feedback MUTED (Click to Enable)'}
+            >
+              {soundOn ? <Volume2 className="w-3.5 h-3.5 text-zinc-200" /> : <VolumeX className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* 9-Vector Rules Matrix Modal Button */}
+            <button
               onClick={() => {
                 soundFX.playClick();
-                onTabChange(tab.id as any);
+                onOpenMatrix();
               }}
-              className={`px-4 py-2 text-xs font-mono flex items-center gap-2 border-b-2 transition-all shrink-0 tracking-wider font-semibold ${
-                isActive
-                  ? 'border-cyan-400 text-cyan-300 bg-cyan-500/10 shadow-[inset_0_-2px_8px_rgba(0,229,255,0.2)]'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700 hover:bg-white/[0.02]'
-              }`}
+              className="px-3 py-1.5 text-xs font-mono rounded-xl bg-black/50 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 hover:border-white/20 flex items-center gap-1.5 transition-all font-medium"
+              title="Inspect 9 Hazard Rules Matrix"
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
-              <span>{tab.label}</span>
+              <Layers className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Rules (9)</span>
             </button>
-          );
-        })}
+
+            {/* Autonomy Benchmark Comparison Modal Button */}
+            <button
+              onClick={() => {
+                soundFX.playClick();
+                onOpenBenchmark();
+              }}
+              className="px-3 py-1.5 text-xs font-mono rounded-xl bg-black/50 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 hover:border-white/20 flex items-center gap-1.5 transition-all font-medium"
+              title="View Autonomy Benchmark Comparison"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-zinc-400" />
+              <span>Benchmark</span>
+            </button>
+
+            {/* Backend Connection Indicator */}
+            <span
+              className={`text-xs font-mono px-3 py-1 rounded-full border flex items-center gap-1.5 font-medium ${
+                backendConnected
+                  ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.2)]'
+                  : 'bg-amber-950/40 text-amber-400 border-amber-500/30'
+              }`}
+              title={backendConnected ? 'Connected to AEGIS Backend REST API (Port 3001)' : 'Offline: Local Fallback Simulation'}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  backendConnected ? 'bg-emerald-400' : 'bg-amber-400'
+                }`}
+              />
+              <span>{backendConnected ? 'API 3001: ONLINE' : 'API: LOCAL'}</span>
+            </span>
+
+            {/* Active Mission Switcher */}
+            {availableMissions.length > 0 && onSelectMission && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-mono text-zinc-500 uppercase tracking-wider">Mission:</span>
+                <select
+                  value={activeMissionId}
+                  onChange={(e) => {
+                    soundFX.playClick();
+                    onSelectMission(e.target.value);
+                  }}
+                  className="text-xs font-mono bg-black/70 text-zinc-200 border border-white/10 rounded-lg px-2.5 py-1 focus:outline-none focus:border-white/30 cursor-pointer"
+                  title="Switch Active Mission Instance"
+                >
+                  {availableMissions.map((m) => (
+                    <option key={m.id} value={m.id} className="bg-zinc-900 text-zinc-200">
+                      {m.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <span className="text-xs font-mono text-zinc-500 border border-white/8 px-2 py-0.5 rounded bg-black/40 hidden sm:inline">
+              SEED: {seed}
+            </span>
+          </div>
+        </div>
+
+        {/* Row 3: Numbered Navigation Bar */}
+        <div className="flex items-center gap-1 border-t border-white/[0.05] overflow-x-auto">
+          {[
+            { id: 'DASHBOARD', idx: '00', label: 'Mission Overview', icon: Globe },
+            { id: 'MAP', idx: '01', label: 'Tactical Terrain Map', icon: Crosshair },
+            { id: 'TELEMETRY', idx: '02', label: 'Telemetry Analytics', icon: Zap },
+            { id: 'ASSISTANT', idx: '03', label: 'AEGIS-Core AI', icon: Bot },
+            { id: 'LOGS', idx: '04', label: 'Decision Stream', icon: Radio },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  soundFX.playClick();
+                  onTabChange(tab.id as any);
+                }}
+                className={`px-4 py-2 text-xs font-mono flex items-center gap-2 border-b-2 transition-all shrink-0 tracking-wider ${
+                  isActive
+                    ? 'border-white text-white font-bold bg-white/[0.04]'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 hover:bg-white/[0.01]'
+                }`}
+              >
+                <span className={`text-[10px] font-mono ${isActive ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                  {tab.idx}
+                </span>
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-zinc-500'}`} />
+                <span className="uppercase tracking-wider font-space text-[11px]">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </header>
   );

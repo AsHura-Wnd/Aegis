@@ -51,26 +51,26 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
   const missionCount = benchmarkData?.missionCount ?? 100;
 
   return (
-    <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#070b16] border border-cyan-500/50 rounded-2xl max-w-2xl w-full shadow-[0_0_40px_rgba(0,229,255,0.2)] p-6 overflow-y-auto max-h-[90vh] relative hud-panel-pro">
+    <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+      <div className="bg-[#0c0c11] border border-white/10 rounded-2xl max-w-2xl w-full p-6 overflow-y-auto max-h-[90vh] relative aegis-card shadow-2xl">
         {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shadow-[0_0_12px_rgba(0,229,255,0.3)]">
-              <BarChart3 className="w-5 h-5 text-cyan-400" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center text-zinc-200">
+              <BarChart3 className="w-5 h-5 text-zinc-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-space font-bold text-white tracking-wide">
+                <h2 className="text-sm font-syne font-bold text-white tracking-wide uppercase">
                   AEGIS Autonomy vs Traditional Ground Teleoperation
                 </h2>
                 {benchmarkData && (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-white/10">
                     LIVE ENGINE
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 font-space">
+              <p className="text-xs text-zinc-400 font-mono mt-0.5">
                 Headless benchmark analysis across {missionCount} seeded simulated Mars traverse scenarios.
               </p>
             </div>
@@ -79,10 +79,10 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
             <button
               onClick={handleRunLiveBenchmark}
               disabled={isRunning}
-              className="px-2.5 py-1 text-xs font-mono rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 flex items-center gap-1.5 transition-all disabled:opacity-50"
-              title="Run Live Headless Benchmark on Backend (Port 3001)"
+              className="px-3 py-1.5 text-xs font-mono rounded-lg bg-zinc-100 hover:bg-white text-black font-bold flex items-center gap-1.5 transition-all disabled:opacity-50"
+              title="Run Live Headless Benchmark on Backend"
             >
-              {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+              {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
               <span>{isRunning ? 'Simulating...' : 'Run Benchmark'}</span>
             </button>
             <button
@@ -90,7 +90,7 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
                 soundFX.playClick();
                 onClose();
               }}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+              className="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-white/5"
             >
               <X className="w-5 h-5" />
             </button>
@@ -98,87 +98,82 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
         </div>
 
         {/* Highlight Comparison Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-emerald-500/30 text-center shadow-sm">
-            <span className="text-[11px] font-space text-slate-400 font-semibold">Mission Survival</span>
-            <div className="text-2xl font-space font-bold text-emerald-400 mt-1">{survivalRate}%</div>
-            <span className="text-[10px] font-space text-slate-500">vs {baselineSurvival}% teleoperation</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <div className="p-3.5 rounded-xl bg-zinc-900/50 border border-white/[0.08]">
+            <div className="text-[11px] font-mono text-zinc-400 uppercase">Traverse Survival</div>
+            <div className="text-2xl font-syne font-bold text-white mt-1">
+              {survivalRate}%
+            </div>
+            <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
+              vs {baselineSurvival}% teleop
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-cyan-500/30 text-center shadow-sm">
-            <span className="text-[11px] font-space text-slate-400 font-semibold">Response Latency</span>
-            <div className="text-2xl font-space font-bold text-cyan-400 mt-1">{resolutionSec}s</div>
-            <span className="text-[10px] font-space text-slate-500">vs 42.5 min roundtrip</span>
+          <div className="p-3.5 rounded-xl bg-zinc-900/50 border border-white/[0.08]">
+            <div className="text-[11px] font-mono text-zinc-400 uppercase">Avg Recovery Time</div>
+            <div className="text-2xl font-syne font-bold text-white mt-1">
+              {resolutionSec}s
+            </div>
+            <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
+              vs 1200s (Earth comm delay)
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-yellow-500/30 text-center shadow-sm">
-            <span className="text-[11px] font-space text-slate-400 font-semibold">Power Conserved</span>
-            <div className="text-2xl font-space font-bold text-yellow-400 mt-1">+{powerSaved}%</div>
-            <span className="text-[10px] font-space text-slate-500">lower stall waste</span>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-purple-500/30 text-center shadow-sm">
-            <span className="text-[11px] font-space text-slate-400 font-semibold">Traverse Velocity</span>
-            <div className="text-2xl font-space font-bold text-purple-400 mt-1">+{speedBoost}%</div>
-            <span className="text-[10px] font-space text-slate-500">continuous autonomy</span>
+          <div className="p-3.5 rounded-xl bg-zinc-900/50 border border-white/[0.08]">
+            <div className="text-[11px] font-mono text-zinc-400 uppercase">Speed Increase</div>
+            <div className="text-2xl font-syne font-bold text-white mt-1">
+              +{speedBoost}%
+            </div>
+            <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
+              {powerSaved}% power saved
+            </div>
           </div>
         </div>
 
-        {/* Detailed Benchmark Table */}
-        <div className="overflow-x-auto mb-6">
-          <table className="w-full text-left text-xs font-space border-collapse">
-            <thead>
-              <tr className="border-b border-white/10 text-slate-400 text-[11px]">
-                <th className="py-2.5 px-3">Evaluation Metric</th>
-                <th className="py-2.5 px-3 text-red-300">Traditional Teleoperation</th>
-                <th className="py-2.5 px-3 text-cyan-300">AEGIS Autonomous Intelligence</th>
-                <th className="py-2.5 px-3 text-emerald-400">Improvement Delta</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5 text-slate-300">
-              <tr>
-                <td className="py-2.5 px-3 font-semibold">Comm Delay Dependency</td>
-                <td className="py-2.5 px-3 text-slate-400">14–24 min light travel</td>
-                <td className="py-2.5 px-3 text-cyan-300 font-bold">0.0 ms (Edge processing)</td>
-                <td className="py-2.5 px-3 text-emerald-400 font-bold">100% Autonomous</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-semibold">Sand Trap Extrication</td>
-                <td className="py-2.5 px-3 text-slate-400">2–5 Sols (Manual sequence)</td>
-                <td className="py-2.5 px-3 text-cyan-300 font-bold">18 seconds (Peristaltic auto)</td>
-                <td className="py-2.5 px-3 text-emerald-400 font-bold">99.8% faster</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-semibold">Steep Incline Avoidance</td>
-                <td className="py-2.5 px-3 text-slate-400">Post-facto rollover risk</td>
-                <td className="py-2.5 px-3 text-cyan-300 font-bold">Predictive contour spline detour</td>
-                <td className="py-2.5 px-3 text-emerald-400 font-bold">Zero rollovers</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-semibold">Thermal Protection</td>
-                <td className="py-2.5 px-3 text-slate-400">Manual heater schedule</td>
-                <td className="py-2.5 px-3 text-cyan-300 font-bold">Dynamic closed-loop PID control</td>
-                <td className="py-2.5 px-3 text-emerald-400 font-bold">+28% battery saved</td>
-              </tr>
-              <tr>
-                <td className="py-2.5 px-3 font-semibold">Loss-of-Signal (LOS) State</td>
-                <td className="py-2.5 px-3 text-slate-400">Frozen stationary hold</td>
-                <td className="py-2.5 px-3 text-cyan-300 font-bold">Safe navigation to crest</td>
-                <td className="py-2.5 px-3 text-emerald-400 font-bold">Mission continuity</td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Comparison Details Table */}
+        <div className="rounded-xl border border-white/[0.08] overflow-hidden bg-zinc-950/40 font-mono text-xs mb-4">
+          <div className="grid grid-cols-3 p-2.5 bg-zinc-900/80 border-b border-white/[0.08] font-bold text-zinc-300 text-[11px] uppercase">
+            <span>Capability / Vector</span>
+            <span className="text-zinc-400">Earth Teleoperation</span>
+            <span className="text-white">AEGIS Autonomous Edge</span>
+          </div>
+
+          <div className="divide-y divide-white/5 text-[11px]">
+            <div className="grid grid-cols-3 p-2.5 items-center">
+              <span className="text-zinc-300">Hazard Detection</span>
+              <span className="text-zinc-500">Post-event telemetry dump</span>
+              <span className="text-zinc-200 font-semibold">10Hz Real-time sensor stream</span>
+            </div>
+            <div className="grid grid-cols-3 p-2.5 items-center">
+              <span className="text-zinc-300">Comm Blackout Handling</span>
+              <span className="text-zinc-500">Safe mode halt until LOS ends</span>
+              <span className="text-zinc-200 font-semibold">Autonomous dead-reckoning & buffer</span>
+            </div>
+            <div className="grid grid-cols-3 p-2.5 items-center">
+              <span className="text-zinc-300">Entrapment Mitigation</span>
+              <span className="text-zinc-500">Manual wheel rocking sequence</span>
+              <span className="text-zinc-200 font-semibold">Torque vectoring extraction</span>
+            </div>
+            <div className="grid grid-cols-3 p-2.5 items-center">
+              <span className="text-zinc-300">Thermal Survival</span>
+              <span className="text-zinc-500">Scheduled passive sleep</span>
+              <span className="text-zinc-200 font-semibold">Adaptive heating load shedding</span>
+            </div>
+          </div>
         </div>
 
-        {/* Architecture Note */}
-        <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/30 text-xs font-sans text-slate-300 flex items-start gap-3">
-          <Shield className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
-          <div>
-            <strong className="text-cyan-300 font-space font-semibold">AEGIS Safety Guarantee:</strong>
-            <p className="mt-0.5 leading-relaxed text-[11px] text-slate-300 font-space">
-              By combining continuous 9-vector hazard detection with deterministic risk scoring and explainable autonomous action planning, AEGIS eliminates single-point teleoperation failures while maintaining strict safety boundaries.
-            </p>
-          </div>
+        {/* Footer info */}
+        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 pt-2 border-t border-white/5">
+          <span>Deterministic seed isolation • Mars 2026 Flight Model</span>
+          <button
+            onClick={() => {
+              soundFX.playClick();
+              onClose();
+            }}
+            className="px-3 py-1 rounded bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>

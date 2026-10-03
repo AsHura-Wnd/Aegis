@@ -2,34 +2,35 @@
 
 @layer base {
   :root {
-    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-space: 'Space Grotesk', sans-serif;
+    --font-display: 'Space Grotesk', 'Syne', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
-    --font-orbitron: 'Space Grotesk', 'Orbitron', sans-serif;
-    --font-rajdhani: 'Space Grotesk', sans-serif;
+    --font-orbitron: 'Space Grotesk', sans-serif;
+    --font-rajdhani: 'Inter', sans-serif;
   }
 
   body, button, input, select, textarea {
-    font-family: 'Space Grotesk', var(--font-sans);
-    background-color: #04060b;
-    color: #f1f5f9;
+    font-family: var(--font-sans);
+    background-color: #070709;
+    color: #e4e4e7;
     overflow-x: hidden;
   }
 
   .font-space {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-space);
   }
 
   .font-sans {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-sans);
   }
 
   .font-orbitron {
-    font-family: 'Space Grotesk', var(--font-orbitron);
+    font-family: var(--font-display);
   }
 
   .font-rajdhani {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-sans);
   }
 
   code, pre, .font-mono {
@@ -37,176 +38,275 @@
   }
 }
 
-/* Custom Tactical Scrollbar */
+/* Custom Minimalist Dark Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #060913;
+  background: #09090c;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #27272a;
   border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00e5ff88;
+  background: #3f3f46;
 }
 
-/* Futuristic Aerospace Backgrounds & Grids */
-.bg-space-dark {
-  background-color: #04060b;
+/* Dribbble Reference Space Bedrock Atmosphere */
+.bg-space-dark, .bg-space-bedrock {
+  background-color: #060608;
   background-image: 
-    radial-gradient(ellipse at 50% 0%, rgba(14, 165, 233, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    radial-gradient(circle at 50% 10%, rgba(35, 35, 45, 0.25) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(7, 7, 9, 0.82) 0%, rgba(9, 9, 12, 0.94) 100%),
+    url('/src/assets/space_bedrock_bg.jpg');
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-/* High-Tech Tactical HUD Panels */
-.hud-panel-pro {
-  background: linear-gradient(135deg, rgba(10, 15, 28, 0.85) 0%, rgba(6, 9, 18, 0.92) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 229, 255, 0.15);
-  box-shadow: 
-    0 4px 24px -2px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+/* Reference Semi-Transparent Glassmorphic Panels */
+.hud-panel-pro, .aegis-card {
+  background: rgba(10, 12, 18, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
   position: relative;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.hud-panel-pro::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid #00e5ff;
-  border-left: 2px solid #00e5ff;
-  pointer-events: none;
-  opacity: 0.8;
-}
-
-.hud-panel-pro::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  border-bottom: 2px solid #00e5ff;
-  border-right: 2px solid #00e5ff;
-  pointer-events: none;
-  opacity: 0.8;
+.hud-panel-pro:hover, .aegis-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .hud-panel-danger {
-  background: linear-gradient(135deg, rgba(30, 8, 12, 0.85) 0%, rgba(15, 4, 8, 0.92) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  box-shadow: 
-    0 4px 24px -2px rgba(239, 68, 68, 0.15),
-    inset 0 1px 0 rgba(239, 68, 68, 0.2);
+  background: rgba(26, 11, 15, 0.78);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(244, 63, 94, 0.2);
 }
 
-.hud-panel-danger::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid #ef4444;
-  border-left: 2px solid #ef4444;
-  pointer-events: none;
+/* Minimalist Editorial Helpers inspired by Dribbble Reference */
+.editorial-num {
+  font-family: var(--font-mono);
+  color: #52525b;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  font-weight: 600;
 }
 
-.hud-panel-danger::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 8px;
-  height: 8px;
-  border-bottom: 2px solid #ef4444;
-  border-right: 2px solid #ef4444;
-  pointer-events: none;
+.editorial-header {
+  font-family: var(--font-space);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #ffffff;
 }
 
-/* Glowing Accent Utilities */
+/* Subtle glow utilities */
 .glow-cyan {
-  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+  color: #ffffff;
 }
 
 .glow-red {
-  text-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+  color: #f43f5e;
 }
 
 .glow-amber {
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  color: #fbbf24;
 }
 
 .glow-emerald {
-  text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  color: #34d399;
 }
 
-.box-glow-cyan {
-  box-shadow: 0 0 20px -3px rgba(0, 229, 255, 0.3);
+/* Subtle Animated Space Background & Mars Atmospheric Effects */
+.mars-corona {
+  background: radial-gradient(circle at 35% 35%, rgba(255, 160, 60, 0.48) 0%, rgba(240, 95, 25, 0.22) 36%, rgba(200, 50, 10, 0.06) 58%, transparent 72%);
+  filter: blur(22px);
 }
 
-.box-glow-red {
-  box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.35);
+.mars-rim-glow {
+  box-shadow: 
+    -3px -3px 25px rgba(255, 175, 75, 0.5),
+    -8px -8px 60px rgba(240, 110, 30, 0.25);
 }
 
-/* Scanlines overlay */
-.scanlines {
-  position: relative;
-}
-
-.scanlines::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.2) 50%
+.mars-sphere-lighting {
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 240, 220, 0.18) 0%,
+    rgba(255, 140, 50, 0.10) 30%,
+    rgba(25, 8, 5, 0.45) 58%,
+    rgba(4, 5, 7, 0.98) 88%
   );
-  background-size: 100% 3px;
+  mix-blend-mode: multiply;
+}
+
+.mars-terminator {
+  background: radial-gradient(
+    circle at 32% 32%,
+    transparent 0%,
+    transparent 38%,
+    rgba(4, 5, 7, 0.35) 52%,
+    rgba(4, 5, 7, 0.85) 70%,
+    rgba(4, 5, 7, 1) 88%
+  );
+}
+
+.mars-inner-limb {
+  box-shadow: 
+    inset 2px 2px 10px rgba(255, 245, 220, 0.92),
+    inset 6px 6px 30px rgba(255, 150, 50, 0.65),
+    inset 14px 14px 55px rgba(210, 80, 20, 0.35);
+}
+
+@keyframes mars-surface-rotate {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-mars-rotate {
+  animation: mars-surface-rotate 125s linear infinite;
+}
+
+@keyframes mars-corona-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.04);
+  }
+}
+
+.animate-mars-pulse {
+  animation: mars-corona-pulse 18s ease-in-out infinite;
+}
+
+@keyframes star-drift-a {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -8px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-star-drift-1 {
+  animation: star-drift-a 140s ease-in-out infinite;
+}
+
+@keyframes star-drift-b {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-10px, 12px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-star-drift-2 {
+  animation: star-drift-b 110s ease-in-out infinite;
+}
+
+@keyframes star-twinkle-cycle {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.animate-star-twinkle {
+  animation: star-twinkle-cycle 8s ease-in-out infinite;
+}
+
+@keyframes star-pulse-glow {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-star-pulse {
+  animation: star-pulse-glow 6s ease-in-out infinite;
+}
+
+/* Prominent Guide Stars with 4-Point Optical Diffraction Spikes */
+.star-prominent {
+  position: absolute;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.95), 0 0 18px 4px rgba(245, 190, 130, 0.55);
+}
+
+.star-prominent::before,
+.star-prominent::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%);
   pointer-events: none;
-  opacity: 0.4;
-  z-index: 5;
 }
 
-/* Animations */
-@keyframes sweep {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.star-prominent::before {
+  width: 16px;
+  height: 1px;
 }
 
-.animate-sweep {
-  animation: sweep 4s linear infinite;
+.star-prominent::after {
+  width: 1px;
+  height: 16px;
 }
 
-@keyframes pulse-halo {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.08); }
+/* Cosmic Nebula Dust Stream */
+.cosmic-dust-filament {
+  background: radial-gradient(
+    ellipse 520px 160px at 50% 50%,
+    rgba(210, 180, 240, 0.14) 0%,
+    rgba(140, 150, 200, 0.07) 42%,
+    transparent 75%
+  );
+  filter: blur(14px);
 }
 
-.animate-pulse-halo {
-  animation: pulse-halo 2.5s ease-in-out infinite;
+/* Accessibility: respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-mars-rotate,
+  .animate-mars-pulse,
+  .animate-star-drift-1,
+  .animate-star-drift-2,
+  .animate-star-twinkle,
+  .animate-star-pulse {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
-@keyframes radar-ping {
-  0% { transform: scale(0.6); opacity: 1; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
 
-.animate-radar-ping {
-  animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
