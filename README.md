@@ -1,207 +1,256 @@
-# AEGIS — Autonomous Planetary Rover Mission-Intelligence & Safety System
-**IndustrySolve Hackathon — IIIT Delhi**
-
-AEGIS is an aerospace-grade planetary rover mission-intelligence and autonomous safety system designed for simulated Mars surface exploration (Jezero Crater Sector 4). It features:
-- **Full-Stack Architecture**: React 19 + TypeScript + Tailwind frontend mission dashboard and an independent Node.js + Express + TypeScript REST API backend.
-- **Server-Side Mission State Management**: Isolated mission instances with deterministic seeded simulation, background ticking, and replay.
-- **9-Vector Hazard Detection Engine**: Continuous automated telemetry evaluation across power, thermal, mobility, communication, and terrain.
-- **Dynamic Compounding Risk Assessment**: 0–100 scale with explicit change reasoning and multi-fault compounding risk multipliers.
-- **Explainable Decision Engine**: Automated mode shifts, peristaltic crab-walk extraction, and full chronological decision & event stream.
-- **Context-Aware AI Assistant**: Offline deterministic rule-based intelligence grounded in live simulation numbers, with optional Gemini 1.5 hybrid mode.
-- **Headless Benchmark Engine**: Quantitative comparison of AEGIS on-board autonomy vs traditional 14-minute Earth ground teleoperation.
+# AEGIS — Autonomous Exploration & Ground Intelligence System
+**Aerospace-Grade Planetary Rover Mission-Intelligence & Autonomous Safety Architecture**  
+*Developed for IndustrySolve Hackathon — IIIT Delhi*
 
 ---
 
-## 🚀 Quick Start Commands
+## 📌 Executive Summary
 
+### The Problem
+During planetary exploration on Mars, radio frequency communications between the rover and Earth ground control experience a **one-way latency of 7 to 22 minutes** (14 to 45 minutes round-trip), punctuated by extended orbiter occultations and solar conjunction blackouts. When unexpected hazards occur—such as hidden drift sand entrapment (which claimed NASA's *Spirit* rover in 2009), steep crater scree rollovers, or subsystem thermal runaways—waiting for ground teleoperation commands can be fatal.
+
+### The Solution: AEGIS
+**AEGIS** (Autonomous Exploration & Ground Intelligence System) provides an on-board, edge-autonomous mission-intelligence and safety executive. It continuously evaluates 60+ parameters across 9 hazard vectors, calculates compounding multi-fault risk scores, triggers immediate operational mode transitions (e.g. Peristaltic Rocker-Bogie Crab-Walk extrication), recalculates risk-aware routes to solar havens, and logs explainable engineering decisions—**resolving critical anomalies in under 2 seconds at the edge rather than 45 minutes from Earth.**
+
+---
+
+## 🚀 Key System Features
+
+1. **Standalone Node.js + Express REST Architecture**: Decoupled backend service running independently of browser rendering, exposing 21 validated REST endpoints.
+2. **Deterministic Seeded Kinematics**: PRNG-driven 6-wheel rocker-bogie simulation guaranteeing 100% bit-accurate state replay across identical seeds.
+3. **9-Vector Real-Time Hazard Engine**: Continuous automated detection across Power, Thermal, Mobility, Communications, and Terrain.
+4. **Dynamic Compounding Risk Engine**: 0–100 composite risk scoring with explicit change reasoning and 5 multi-fault interaction multipliers (+25% to +40%).
+5. **Explainable Autonomous Decision Executive**: Automated mode transitions between 5 operational modes with natural language engineering rationales.
+6. **Peristaltic Rocker-Bogie Recovery**: Autonomous extrication protocols for deep sand entrapment and steep slope roll hazards.
+7. **Headless Monte Carlo Benchmark Engine**: Quantitative validation simulating $N$ seeded missions, demonstrating a **1417x incident resolution speedup** and **100% vs 93.3% survival rate**.
+8. **Context-Aware AI Mission Assistant**: Dual-tier intelligence engine grounded in live telemetry, with automatic fallback from Gemini LLM to deterministic rules.
+9. **Interactive Mission Control Dashboard**: React 19 + TypeScript + Tailwind HUD featuring dynamic 2D DEM canvas mapping, real-time telemetry tiles, and scenario injection controls.
+
+---
+
+## 🛰️ Architecture Overview
+
+```mermaid
+flowchart TB
+    subgraph Client["Mission Control Dashboard (Port 5173)"]
+        HUD["Telemetry HUD & Charts"]
+        MAP["2D Tactical Surface DEM Map"]
+        SCEN["Fault Injection Panel"]
+        AI_UI["AI Mission Assistant"]
+    end
+
+    subgraph Backend["AEGIS Backend REST Service (Port 3001)"]
+        direction TB
+        API["Express REST Router\n(/api/missions, /api/benchmark, /api/health)"]
+
+        subgraph MissionService["Mission Service (State Isolation)"]
+            INST_1["MissionInstance: primary-mission\n(Seed: 1337)"]
+            INST_N["MissionInstance: mission-N\n(Isolated State & Timers)"]
+        end
+
+        subgraph CoreEngines["Autonomous Engine Core"]
+            SIM["RoverSimulationModel\n(Seeded Kinematics)"]
+            HAZ["HazardDetectionEngine\n(9 Continuous Rules)"]
+            RISK["DynamicRiskEngine\n(Additive & Compounding)"]
+            DEC["AutonomousDecisionEngine\n(Mode Shift & Recovery)"]
+            AI["AegisAIAssistant\n(Grounded Intelligence)"]
+        end
+
+        BENCH["HeadlessBenchmarkEngine\n(N-Mission Monte Carlo)"]
+    end
+
+    Client <-->|REST APIs / JSON| API
+    API --> MissionService
+    MissionService --> INST_1
+    INST_1 --- CoreEngines
+    API --> BENCH
+```
+
+---
+
+## 💻 Technology Stack
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Backend Runtime** | Node.js (ESM), TypeScript (`~6.0.2`), tsx (`^4.23.15`) |
+| **Server Framework** | Express (`^5.2.1`), cors (`^2.8.6`) |
+| **Frontend Framework** | React 19 (`^19.2.8`), React DOM, Vite (`^8.3.0`), Tailwind CSS (`^4.3.3`) |
+| **Testing & Quality** | Vitest (`^5.0.3`), Supertest (`^7.3.1`), JSDOM (`^30.1.1`), Oxlint (`^1.81.0`) |
+| **Icons & UI** | Lucide React (`^1.50.0`), clsx, tailwind-merge |
+
+---
+
+## 📂 Repository Structure
+
+```
+aegis/
+├── docs/                 # Official technical documentation
+│   ├── ARCHITECTURE.md   # System architecture & component design
+│   ├── ROADMAP.md        # Implementation roadmap across Phases 0–5
+│   ├── API.md            # Complete REST API reference specification
+│   ├── TESTING.md        # Test suite strategy, commands, & results
+│   ├── SCENARIOS.md      # The 6 operational fault scenarios
+│   ├── DECISIONS.md      # Architectural Decision Records (ADRs)
+│   ├── DEMO_SCRIPT.md    # 5–7 minute hackathon presentation walkthrough
+│   ├── KNOWN_LIMITATIONS.md # Known technical constraints & approximations
+│   ├── CONTRIBUTING.md   # Developer guidelines & coding standards
+│   └── REQUIREMENTS.md   # Requirements Traceability Matrix (RTM)
+├── scripts/              # Audit & benchmark CLI scripts
+│   └── testAudit.mjs     # Live HTTP pipeline, replay, & scenario audit
+├── src/
+│   ├── server/           # Backend Express application, models, routes, services
+│   ├── simulation/       # Rover kinematics, DEM terrain, and scenarios
+│   ├── engines/          # Hazard, dynamic risk, decision, and AI assistant
+│   ├── components/       # React mission control dashboard components
+│   ├── types/            # Canonical TypeScript schemas and enums
+│   └── __tests__/        # Vitest test suites (33 tests)
+├── package.json          # Dependencies and CLI scripts
+├── vite.config.ts        # Vite build & frontend server configuration
+└── README.md             # Project master overview
+```
+
+---
+
+## ⚡ Quick Start & Installation
+
+### Prerequisites
+- **Node.js**: v18.0.0 or higher (v20+ recommended)
+- **npm**: v9.0.0 or higher
+
+### Installation
 ```bash
-# 1. Install all dependencies
+# 1. Clone repository
+git clone https://github.com/your-org/aegis.git
+cd aegis
+
+# 2. Install dependencies
 npm install
+```
 
-# 2. Run complete test suite (33 unit & integration tests)
-npm test
+### Environment Variables
+Environment variables can be configured via `.env` or system environment:
+- `PORT`: Backend server HTTP port (default: `3001`).
+- `HOST`: Backend host address (default: `0.0.0.0`).
+- `GEMINI_API_KEY`: *(Optional)* Google Gemini API key for hybrid cloud LLM reasoning in the AI assistant. If omitted, the assistant operates seamlessly using its offline deterministic rules engine.
 
-# 3. Run backend tests specifically
-npm run test:backend
+---
 
-# 4. Start the Node.js + Express backend server (Port 3001)
+## 🏃 Running the Application
+
+### 1. Launch Standalone Backend (Port 3001)
+```bash
 npm run server
+# Or with auto-reload during development:
+npm run server:dev
+```
+- Health Check: [http://localhost:3001/api/health](http://localhost:3001/api/health)
+- Mission List: [http://localhost:3001/api/missions](http://localhost:3001/api/missions)
 
-# 5. Start the Vite React frontend dashboard (Port 5173)
+### 2. Launch Frontend Dashboard (Port 5173)
+```bash
 npm run dev
+```
+- Mission Control UI: [http://localhost:5173/](http://localhost:5173/)
 
-# 6. Production build check
+### 3. Production Build
+```bash
 npm run build
 ```
 
-- **Frontend Dashboard**: [http://localhost:5173/](http://localhost:5173/)
-- **Backend REST API**: [http://localhost:3001/](http://localhost:3001/)
-- **API Health Check**: [http://localhost:3001/api/health](http://localhost:3001/api/health)
+---
+
+## 🧪 Testing & Verification
+
+AEGIS includes a comprehensive 33-test automated test suite:
+
+```bash
+# Run complete test suite (unit, integration, and backend tests)
+npm test
+
+# Run backend API integration tests specifically
+npm run test:backend
+
+# Run live HTTP audit (tests replay determinism, 6 scenarios, & benchmark)
+node scripts/testAudit.mjs
+```
+
+### Verified Test Summary
+- **Unit & Kinematic Tests** (`src/__tests__/aegis.test.ts`): 18/18 passing.
+- **Backend API Tests** (`src/__tests__/backend.test.ts`): 11/11 passing.
+- **Frontend Dashboard Tests** (`src/__tests__/app.integration.test.tsx`): 4/4 passing.
+- **Total Passing Tests**: **33 / 33 (100% passing)**.
 
 ---
 
-## 🛰️ System Architecture
+## 📡 REST API Overview
 
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│                   FRONTEND MISSION DASHBOARD (Port 5173)               │
-│ - HUD Telemetry Monitors  - 2D Canvas Map  - Scenario Controls         │
-│ - AI Intelligence Tab     - Rules Matrix   - Benchmark Modal           │
-└────────────────────────────────────────────────────────────────────────┘
-                                    ▲
-                         REST APIs  │  JSON Payloads
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│               NODE.JS + EXPRESS BACKEND SERVER (Port 3001)             │
-│  [MissionService] ────► [MissionInstance: id, seed, isolated state]    │
-│  [BenchmarkService] ──► Headless evaluation across N seeded missions   │
-└────────────────────────────────────────────────────────────────────────┘
-          │                                              │
-          ▼                                              ▼
-┌──────────────────────────────┐              ┌──────────────────────────────┐
-│     ROVER SIMULATION MODEL   │              │   9-VECTOR HAZARD ENGINE     │
-│ - Bounded realistic physics  │ ──Telemetry─►│ 1. Low Battery Reserve       │
-│ - 6-Wheel rocker-bogie slip  │              │ 2. Subsystem Overheating     │
-│ - Diurnal solar & dust flux  │              │ 3. Extreme Cryogenic Cold    │
-│ - Thermal balance (-100..80) │              │ 4. Excessive Wheel Slip      │
-│ - Terrain digital elevation  │              │ 5. Locomotion Entrapment     │
-└──────────────────────────────┘              │ 6. Solar Dust Deposition     │
-               │                              │ 7. Weak Comm / LOS           │
-               ▼                              │ 8. Dangerous Terrain Slope   │
-┌──────────────────────────────┐              │ 9. Rapid Power Drain         │
-│     2D TACTICAL SURFACE MAP  │              └──────────────────────────────┘
-│ - Jezero Crater Sector 4 DEM │                              │
-│ - Dynamic elevation contours │                              ▼
-│ - Directional rover + LiDAR  │              ┌──────────────────────────────┐
-│ - Color-coded trail & zones  │              │     DYNAMIC RISK ENGINE      │
-└──────────────────────────────┘              │ - 0-100 score (LOW..CRITICAL)│
-                                              │ - Compounding multipliers    │
-                                              │ - "Why score changed" driver │
-                                              └──────────────────────────────┘
-                                                              │
-    ┌─────────────────────────────────────────────────────────┴─────────────┐
-    ▼                                                                       ▼
-┌──────────────────────────────┐              ┌──────────────────────────────┐
-│  AUTONOMOUS DECISION ENGINE  │              │     AEGIS-CORE AI ASSISTANT  │
-│ - Mode transition executive  │              │ - Grounded in live telemetry │
-│ - Peristaltic extraction     │              │ - Deterministic rule engine  │
-│ - Decision & event stream log│              │ - Optional Gemini 1.5 hybrid │
-└──────────────────────────────┘              └──────────────────────────────┘
-```
-
----
-
-## 📡 Backend REST API Reference
-
-All mission endpoints support multiple isolated missions using `:id` (e.g. `primary-mission`).
+All mission endpoints support multi-mission routing using `:id` (e.g. `primary-mission`). For full request/response schemas, see [`docs/API.md`](file:///d:/Projects/Aegis/docs/API.md).
 
 | Method | Endpoint | Description |
-|---|---|---|
+| :--- | :--- | :--- |
 | `GET` | `/api/health` | Backend service health, uptime, and active mission count |
-| `GET` | `/api/missions` | List all active mission instances |
+| `GET` | `/api/missions` | List all active isolated missions |
 | `POST` | `/api/missions` | Create a new isolated mission (`{ name, seed, id }`) |
 | `GET` | `/api/missions/:id` | Get mission metadata and execution state |
-| `DELETE` | `/api/missions/:id` | Delete mission instance and clean up background timers |
-| `POST` | `/api/missions/:id/step` | Advance simulation by N ticks (`{ count?: number, dt?: number }`) |
-| `POST` | `/api/missions/:id/start` | Start server-side continuous ticking (`{ speedMultiplier?: number }`) |
+| `DELETE` | `/api/missions/:id` | Delete mission instance and clear background timers |
+| `POST` | `/api/missions/:id/step` | Advance simulation by N ticks (`{ count, dt }`) |
+| `POST` | `/api/missions/:id/start` | Start server-side continuous ticking (`{ speedMultiplier }`) |
 | `POST` | `/api/missions/:id/pause` | Pause server-side ticking |
-| `GET` | `/api/missions/:id/telemetry`| Get current telemetry snapshot and historical buffer |
-| `GET` | `/api/missions/:id/hazards` | Get active hazards and rule configurations |
-| `PUT` | `/api/missions/:id/hazards/:type` | Update hazard rule thresholds or enable/disable (`{ moderateThreshold, criticalThreshold, enabled }`) |
-| `GET` | `/api/missions/:id/risk` | Get dynamic risk score, level, drivers, and compounding reasoning |
-| `GET` | `/api/missions/:id/scenarios`| List all 6 demonstration scenarios in catalog |
-| `POST` | `/api/missions/:id/scenarios`| Inject fault scenario (`{ scenarioId: "ROVER_STUCK" \| "LOW_BATTERY" \| ... }`) |
-| `POST` | `/api/missions/:id/scenarios/clear` | Clear all active faults and return subsystems to nominal |
-| `POST` | `/api/missions/:id/mitigate` | Execute autonomous mitigation protocol (`{ hazardType?: string }`) |
-| `GET` | `/api/missions/:id/decisions`| Get most recent autonomous decision and event stream logs (filterable by `category`) |
-| `POST` | `/api/missions/:id/assistant`| Context-aware AI assistant query (`{ query: string, apiKey?: string }`) |
-| `POST` | `/api/missions/:id/reset` | Reset mission to initial state with seed (`{ seed?: number }`) |
-| `POST` | `/api/missions/:id/replay`| Replay mission from tick 0 with identical seed |
-| `POST` | `/api/benchmark` | Run headless benchmark across N seeded missions comparing AEGIS vs teleoperation |
+| `GET` | `/api/missions/:id/telemetry` | Get current telemetry snapshot and ring buffer history |
+| `GET` | `/api/missions/:id/hazards` | Get active hazards and all 9 rule configurations |
+| `PUT` | `/api/missions/:id/hazards/:type` | Update thresholds or toggle hazard rules |
+| `GET` | `/api/missions/:id/risk` | Get dynamic risk score (0–100) and compounding drivers |
+| `GET` | `/api/missions/:id/scenarios` | List 6 demonstration fault scenarios |
+| `POST` | `/api/missions/:id/scenarios` | Inject operational scenario (`{ scenarioId }`) |
+| `POST` | `/api/missions/:id/scenarios/clear` | Clear all active faults and normalize telemetry |
+| `POST` | `/api/missions/:id/mitigate` | Execute autonomous mitigation protocol |
+| `GET` | `/api/missions/:id/decisions` | Get decision logs and chronological event stream |
+| `POST` | `/api/missions/:id/assistant` | Query context-aware AI mission assistant |
+| `POST` | `/api/missions/:id/reset` | Reset mission to start coordinates (`MET 00:00:00`) |
+| `POST` | `/api/missions/:id/replay` | Reset and replay mission with initial seed |
+| `POST` | `/api/benchmark` | Run headless Monte Carlo benchmark across N missions |
 
 ---
 
-## 🛡️ The 9 Monitored Hazard Vectors
+## 🛡️ The 9 Hazard Vectors & 6 Scenarios
 
-| # | Hazard Name | Subsystem | Warning Threshold | Critical Threshold | Automated Mitigation Protocol |
-|---|-------------|-----------|-------------------|--------------------|--------------------------------|
-| 1 | **Low Battery Reserve** | Power | SOC ≤ 25% | SOC ≤ 15% | Engage Low-Power Safeguard; suspend science operations; reroute to Solis Plateau Solar Haven. |
-| 2 | **Subsystem Overheating** | Thermal | Motors ≥ 50°C | Motors ≥ 68°C | Halt drive motors; deploy radiator louvers; idle compute cores until < 45°C. |
-| 3 | **Extreme Cryogenic Cold** | Thermal | Core ≤ -35°C | Core ≤ -50°C | Activate electric heating coils; orient solar array towards sun vector; enter thermal hibernation. |
-| 4 | **Excessive Wheel Slip** | Mobility | Slip ≥ 35% | Slip ≥ 60% | Modulate wheel torque by -40%; engage differential slip control; reverse track 1.5m. |
-| 5 | **Locomotion Entrapment** | Mobility | Stall > 2 ticks | Stall ≥ 3 ticks | Lock steering actuators; engage autonomous peristaltic rocker-bogie crab-walk sequence. |
-| 6 | **Solar Dust Deposition** | Power | Efficiency ≤ 60%| Efficiency ≤ 35% | Gimbal solar arrays toward direct sun vector; recalculate diurnal budget; wait for wind event. |
-| 7 | **Weak Comm Link / LOS** | Comm | Link ≤ -92 dBm | Link ≤ -108 dBm | Switch to Full Autonomous Safeguard Mode (ASM); buffer data locally; steer to high vantage. |
-| 8 | **Dangerous Terrain** | Environment | Incline ≥ 18° | Incline ≥ 24° | Apply mechanical parking brake; synthesize 3D stereo point cloud; compute detour spline. |
-| 9 | **Rapid Power Drain** | Power | Draw ≥ 380 W | Draw ≥ 450 W | Isolate auxiliary science bus; sequentially diagnose motor inverters; low quiescent state. |
+### Hazard Vectors Monitored
+1. **Low Battery Reserve**: SoC $\le 25\%$ (Moderate), $\le 15\%$ (Critical).
+2. **Subsystem Overheating**: Motor temps $\ge 50^\circ\text{C}$ (Moderate), $\ge 68^\circ\text{C}$ (Critical).
+3. **Extreme Cryogenic Cold**: Internal chassis $\le -35^\circ\text{C}$ (Moderate), $\le -50^\circ\text{C}$ (Critical).
+4. **Excessive Wheel Slip**: Traction loss ratio $\ge 0.35$ (Moderate), $\ge 0.60$ (Critical).
+5. **Locomotion Entrapment (Rover Stuck)**: Zero displacement for 3 ticks with stall current $> 9.5\text{A}$.
+6. **Solar Dust Deposition**: Photovoltaic conversion efficiency $\le 60\%$ (Moderate), $\le 35\%$ (Critical).
+7. **Weak Communication Link / Comm Loss**: RF carrier $\le -92\text{ dBm}$ (Moderate), $\le -108\text{ dBm}$ (Critical).
+8. **Dangerous Terrain Slope / Roughness**: Surface slope $\ge 18^\circ$ (Moderate), $\ge 24^\circ$ (Critical).
+9. **Rapid Power Drain**: Subsystem electrical draw $\ge 380\text{W}$ (Moderate), $\ge 450\text{W}$ (Critical).
 
----
-
-## 🎮 The 6 Demonstration Scenarios
-
-1. **Depleted Battery Emergency (`LOW_BATTERY`)**: Injects accelerated discharge, dropping battery below 18%. Forces operational mode to `RECHARGE_STANDBY` and recalculates trajectory to the nearest solar haven.
-2. **Loose Dune Sand Entrapment (`ROVER_STUCK`)**: Simulates drift sand sinkage in the Neretva Sand Sea. Wheel slip reaches 88%, actual speed drops to 0.00 m/s despite motor torque, current spikes to 11A. Autonomous decision engine commands peristaltic crab-walk.
-3. **Orbiter Loss-of-Signal (`COMM_LOSS`)**: Simulates canyon obstruction. Signal strength attenuates to -116 dBm with 98% packet loss. Proves the rover immediately transitions to `SAFE_HOLD` / ASM autonomy without requiring Earth intervention.
-4. **Drive Actuator Thermal Runaway (`EXTREME_TEMP`)**: Spikes motor temperatures to 70°C+, triggering radiator deployment and automated motor cooling idle.
-5. **Martian Dust Storm (`SOLAR_DUST`)**: Deposits regolith dust on photovoltaic panels, dropping solar efficiency to 22%.
-6. **Belva Crater Scarp Incline (`HAZARDOUS_TERRAIN`)**: Simulates encountering a 27° scree slope, triggering emergency traverse braking and contour-following detour planning.
+### Demonstration Scenarios
+- `LOW_BATTERY`: Depleted Battery Emergency (forces `RECHARGE_STANDBY` & solar haven reroute).
+- `ROVER_STUCK`: Loose Dune Sand Entrapment (88% slip; triggers `EMERGENCY_RECOVERY` & crab-walk).
+- `COMM_LOSS`: Orbiter Loss-of-Signal (-116 dBm; triggers `SAFE_HOLD` Autonomous Safeguard Mode).
+- `EXTREME_TEMP`: Drive Actuator Thermal Runaway (74°C motor temp; halts drive & deploys louvers).
+- `SOLAR_DUST`: Martian Dust Storm Deposition (22% solar conversion; optimizes array gimbal).
+- `HAZARDOUS_TERRAIN`: Belva Crater Scarp Incline (27.8° slope; executes detour spline).
 
 ---
 
-## 🧪 Verification & Test Results
+## 📖 Comprehensive Documentation Index
 
-The automated test suite runs with `npm test` (`vitest`):
-- **33 Unit & Integration Tests**: 100% passing across 3 test files.
-  - **`src/__tests__/backend.test.ts` (11 tests)**:
-    - Service health endpoint
-    - Multi-mission creation, listing, retrieval, deletion, and complete state isolation
-    - Stepping simulation, telemetry and risk updates
-    - Start and pause controls
-    - Hazard retrieval and threshold updates
-    - Dynamic risk score calculation and change reasoning
-    - Complete scenario-to-decision pipeline for `ROVER_STUCK` (injection -> CRITICAL risk -> hazard detection -> mode shift -> autonomous peristaltic decision -> mitigation execution -> recovery)
-    - Fault injection for all remaining 5 scenarios
-    - Context-aware AI assistant queries grounded in live simulation numbers
-    - Seeded reset and replay
-    - Headless benchmark execution comparing AEGIS vs teleoperation
-  - **`src/__tests__/aegis.test.ts` (18 tests)**:
-    - Bounded telemetry physics and deterministic pseudo-random replayability
-    - All 9 hazard vector thresholds and detection logic
-    - Dynamic risk score computation and compounding multiplier combinations
-    - Autonomous decision engine mode transitions and event logging
-    - Deterministic AI assistant response accuracy
-  - **`src/__tests__/app.integration.test.tsx` (4 tests)**:
-    - Frontend component tree mounting, tab navigation, scenario injection, and modal dialogs
+All detailed technical specifications are maintained in the [`docs/`](file:///d:/Projects/Aegis/docs/) directory:
+- [System Architecture Specification](file:///d:/Projects/Aegis/docs/ARCHITECTURE.md)
+- [Engineering Implementation Roadmap](file:///d:/Projects/Aegis/docs/ROADMAP.md)
+- [REST API Reference Manual](file:///d:/Projects/Aegis/docs/API.md)
+- [Testing & Verification Strategy](file:///d:/Projects/Aegis/docs/TESTING.md)
+- [Operational Fault Scenarios Catalog](file:///d:/Projects/Aegis/docs/SCENARIOS.md)
+- [Architectural Decision Records (ADRs)](file:///d:/Projects/Aegis/docs/DECISIONS.md)
+- [Hackathon Demonstration Script](file:///d:/Projects/Aegis/docs/DEMO_SCRIPT.md)
+- [Known Limitations & Constraints](file:///d:/Projects/Aegis/docs/KNOWN_LIMITATIONS.md)
+- [Engineering Contribution Guidelines](file:///d:/Projects/Aegis/docs/CONTRIBUTING.md)
+- [Requirements Traceability Matrix](file:///d:/Projects/Aegis/docs/REQUIREMENTS.md)
 
 ---
 
-## 🎬 Step-by-Step Live Demo Script
+## ⚠️ Mission Simulation Disclaimer
 
-1. **Verify Backend Service**:
-   - Query `http://localhost:3001/api/health` to confirm the backend is running.
-2. **Launch Mission Control**:
-   - Open dashboard at `http://localhost:5173/`.
-   - Point out the live Mission Elapsed Time (`MET`), nominal telemetry tiles, green `LOW RISK (5/100)` banner, and the rover navigating along waypoints on the 2D Jezero Crater map.
-3. **Inject Fault via API or UI (Scenario: Loose Dune Sand Entrapment)**:
-   - Click **Loose Dune Sand Entrapment** (or send `POST /api/missions/primary-mission/scenarios` with `{"scenarioId": "ROVER_STUCK"}`).
-   - Point out the instant reactions:
-     - 6-wheel slip status jumps to **85%** with red indicators; speed drops to **0.00 m/s** with **11A** motor stall current.
-     - Risk banner escalates to **`CRITICAL RISK (100/100)`** with clear compounding reasoning.
-     - Hazard panel displays `Locomotion Entrapment (Rover Stuck)`.
-     - Decision stream logs `AUTONOMOUS DECISION: Engage Rocker-Bogie Peristaltic Crab-Walk extraction protocol`.
-4. **Execute Autonomous Mitigation**:
-   - Click **Execute Mitigation** (or send `POST /api/missions/primary-mission/mitigate`).
-   - Watch the rover stabilize, slip return to 9%, mode return to `AUTONOMOUS_TRANSIT`, and risk drop back to `LOW`.
-5. **Communication Blackout & Autonomy Handover**:
-   - Click **Orbiter Loss-of-Signal (LOS)**.
-   - Signal drops to -116 dBm; operational mode switches automatically to `SAFE_HOLD` (Autonomous Safeguard Mode), demonstrating zero dependency on Earth ground commands.
-6. **Consult AI Assistant**:
-   - Switch to the **AEGIS-Core AI** tab.
-   - Click prompt chip *"Why is the battery dropping?"* or *"What should the rover do next?"*.
-   - Point out how the assistant cites exact live numbers (battery SOC, net watt deficit, high draw components) and recommends routing to **Solis Plateau Solar Haven**.
-7. **Run Headless Benchmark**:
-   - Click **Benchmark** (or send `POST /api/benchmark`).
-   - Present the quantitative benchmark: 1400x faster incident resolution, +280% traverse speedup, and 100% survival rate vs traditional 14-min Earth ground teleoperation.
-8. **Reset & Replay**:
-   - Click the **Reset** button in the playback bar.
-   - Show that all states, coordinates, and telemetry reset cleanly to `MET 00:00:00` at the landing site, ready to repeat.
+> **IMPORTANT**: AEGIS is a software-only planetary rover mission-intelligence and safety autonomy prototype developed for academic evaluation and hackathon competition. It is **not flight-qualified software** under NASA NPR 7150.2 or DO-178C standards, and is not intended to control physical flight hardware or live spacecraft missions without extensive hardware-in-the-loop (HIL) qualification, real-time operating system (RTOS) re-hosting, and radiation hardening.
