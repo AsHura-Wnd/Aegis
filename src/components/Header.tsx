@@ -25,6 +25,10 @@ interface HeaderProps {
   onOpenBenchmark: () => void;
   onOpenMatrix: () => void;
   seed: number;
+  backendConnected?: boolean;
+  activeMissionId?: string;
+  availableMissions?: Array<{ id: string; name: string }>;
+  onSelectMission?: (id: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,6 +38,10 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenBenchmark,
   onOpenMatrix,
   seed,
+  backendConnected = false,
+  activeMissionId = 'primary-mission',
+  availableMissions = [{ id: 'primary-mission', name: 'Jezero Primary Exploration' }],
+  onSelectMission,
 }) => {
   const [soundOn, setSoundOn] = useState(soundFX.isEnabled());
 
@@ -160,7 +168,47 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">Benchmark</span>
           </button>
 
-          <span className="text-[10px] font-mono text-slate-500 border border-white/5 px-2 py-1 rounded bg-black/50">
+          {/* Backend Connection Indicator */}
+          <span
+            className={`text-[10px] font-mono px-2 py-0.5 rounded border flex items-center gap-1.5 ${
+              backendConnected
+                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+            }`}
+            title={backendConnected ? 'Connected to AEGIS Backend REST API (Port 3001)' : 'Offline: Local Fallback Simulation'}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                backendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+              }`}
+            />
+            <span className="hidden md:inline">{backendConnected ? 'API 3001: ONLINE' : 'API: LOCAL'}</span>
+            <span className="md:hidden">{backendConnected ? 'API' : 'LOCAL'}</span>
+          </span>
+
+          {/* Active Mission Switcher */}
+          {availableMissions.length > 0 && onSelectMission && (
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-mono text-slate-500 hidden xl:inline">MISSION:</span>
+              <select
+                value={activeMissionId}
+                onChange={(e) => {
+                  soundFX.playClick();
+                  onSelectMission(e.target.value);
+                }}
+                className="text-[10px] font-mono bg-black/60 text-cyan-300 border border-cyan-500/30 rounded px-1.5 py-0.5 focus:outline-none focus:border-cyan-400 cursor-pointer"
+                title="Switch Active Mission Instance"
+              >
+                {availableMissions.map((m) => (
+                  <option key={m.id} value={m.id} className="bg-slate-900 text-slate-200">
+                    {m.id}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <span className="text-[10px] font-mono text-slate-500 border border-white/5 px-2 py-1 rounded bg-black/50 hidden sm:inline">
             SEED: {seed}
           </span>
         </div>

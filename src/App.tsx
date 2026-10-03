@@ -21,6 +21,7 @@ import { LogEntry } from './types/log';
 import { RiskAssessment } from './types/risk';
 import { ScenarioId } from './types/scenario';
 import { RoverTelemetry, TelemetryHistoryPoint } from './types/telemetry';
+import { apiClient } from './services/apiClient';
 import { soundFX } from './utils/audio';
 
 export function App() {
@@ -29,7 +30,15 @@ export function App() {
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false);
   const [isMatrixOpen, setIsMatrixOpen] = useState(false);
 
-  // Simulation Core Engines (persistent singletons within lifecycle)
+  // Backend Integration State
+  const [backendConnected, setBackendConnected] = useState<boolean>(false);
+  const [activeMissionId, setActiveMissionId] = useState<string>('primary-mission');
+  const [availableMissions, setAvailableMissions] = useState<Array<{ id: string; name: string }>>([
+    { id: 'primary-mission', name: 'Jezero Primary Exploration' },
+  ]);
+  const [backendTrail, setBackendTrail] = useState<Array<{ x: number; y: number; tick: number }>>([]);
+
+  // Simulation Core Engines (persistent singletons within lifecycle & local fallback)
   const simModelRef = useRef<RoverSimulationModel>(new RoverSimulationModel(1337));
   const hazardEngineRef = useRef<HazardDetectionEngine>(new HazardDetectionEngine());
   const riskEngineRef = useRef<DynamicRiskEngine>(new DynamicRiskEngine());
@@ -54,8 +63,86 @@ export function App() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [telemetryHistory, setTelemetryHistory] = useState<TelemetryHistoryPoint[]>([]);
 
-  // Simulation Tick Execution
-  const tickSimulation = useCallback(() => {
+  // Synchronize mission state from backend
+  const syncFromBackend = useCallback(async (missionId: string) => {
+    try {
+      const [telemRes, hazardsRes, riskRes, decisionsRes] = await Promise.all([
+        apiClient.getTelemetry(missionId),
+        apiClient.getHazards(missionId),
+        apiClient.getRisk(missionId),
+        apiClient.getDecisions(missionId),
+      ]);
+
+      if (telemRes && telemRes.current) {
+        setTelemetry(telemRes.current);
+        if (telemRes.history && telemRes.history.length > 0) {
+          setTelemetryHistory(telemRes.history.slice(-60));
+        }
+        if (telemRes.trail) {
+          setBackendTrail(telemRes.trail);
+        }
+      }
+      if (hazardsRes && hazardsRes.active) {
+        setActiveHazards(hazardsRes.active);
+      }
+      if (riskRes) {
+        setRiskAssessment(riskRes);
+      }
+      if (decisionsRes) {
+        if (decisionsRes.recent) {
+          setRecentDecision(decisionsRes.recent);
+        }
+        if (decisionsRes.logs && decisionsRes.logs.length > 0) {
+          setLogs(decisionsRes.logs.slice(0, 200));
+        }
+      }
+      setBackendConnected(true);
+    } catch {
+      setBackendConnected(false);
+    }
+  }, []);
+
+  // Periodic Backend Health Check & Mission Discovery
+  useEffect(() => {
+    let isMounted = true;
+    const checkConnection = async () => {
+      try {
+        const health = await apiClient.checkHealth();
+        if (!isMounted) return;
+        if (health) {
+          setBackendConnected(true);
+          const missions = await apiClient.listMissions();
+          if (isMounted && missions && missions.length > 0) {
+            setAvailableMissions(missions.map((m) => ({ id: m.id, name: m.name })));
+          }
+        } else {
+          setBackendConnected(false);
+        }
+      } catch {
+        if (isMounted) setBackendConnected(false);
+      }
+    };
+
+    checkConnection();
+    const timer = setInterval(checkConnection, 3000);
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
+  // Simulation Tick Execution (Backend-synced or Local Fallback)
+  const tickSimulation = useCallback(async () => {
+    if (backendConnected) {
+      try {
+        await apiClient.stepMission(activeMissionId, 1);
+        await syncFromBackend(activeMissionId);
+        return;
+      } catch {
+        setBackendConnected(false);
+      }
+    }
+
     const sim = simModelRef.current;
     const hazardEng = hazardEngineRef.current;
     const riskEng = riskEngineRef.current;
@@ -111,7 +198,7 @@ export function App() {
         riskScore: risk.currentScore,
       },
     ].slice(-60));
-  }, []);
+  }, [backendConnected, activeMissionId, syncFromBackend]);
 
   // Interval Loop for Continuous Telemetry
   useEffect(() => {
@@ -124,6 +211,31 @@ export function App() {
 
     return () => clearInterval(timer);
   }, [isRunning, speedMultiplier, tickSimulation]);
+
+  // Mission Switching Handler
+  const handleSelectMission = async (missionId: string) => {
+    setActiveMissionId(missionId);
+    if (backendConnected) {
+      await syncFromBackend(missionId);
+    }
+  };
+
+  // Toggle Running Play/Pause
+  const handleTogglePlay = async () => {
+    const nextState = !isRunning;
+    setIsRunning(nextState);
+    if (backendConnected) {
+      try {
+        if (nextState) {
+          await apiClient.startMission(activeMissionId, speedMultiplier);
+        } else {
+          await apiClient.pauseMission(activeMissionId);
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    }
+  };
 
   // Scenario Injection Handler
   const handleInjectScenario = (scenarioId: ScenarioId) => {
@@ -146,7 +258,7 @@ export function App() {
     };
     setLogs((prev) => [scLog, ...prev]);
 
-    // Apply real physics fault to rover model
+    // Apply real physics fault to rover model locally
     switch (scenarioId) {
       case 'LOW_BATTERY':
         sim.setFaults({ lowBattery: true });
@@ -169,6 +281,13 @@ export function App() {
     }
 
     tickSimulation();
+
+    // Also forward to backend if connected
+    if (backendConnected) {
+      apiClient.injectScenario(activeMissionId, scenarioId)
+        .then(() => syncFromBackend(activeMissionId))
+        .catch(() => {});
+    }
   };
 
   // Clear Faults / Return to Nominal
@@ -189,6 +308,13 @@ export function App() {
     };
     setLogs((prev) => [clearLog, ...prev]);
     tickSimulation();
+
+    // Also forward to backend if connected
+    if (backendConnected) {
+      apiClient.clearFaults(activeMissionId)
+        .then(() => syncFromBackend(activeMissionId))
+        .catch(() => {});
+    }
   };
 
   // Reset Simulation to Initial State
@@ -199,6 +325,7 @@ export function App() {
     decisionEngineRef.current.reset();
     setActiveScenarioId(null);
     setTelemetryHistory([]);
+    setBackendTrail([]);
 
     const initialTelemetry = simModelRef.current.step(0);
     setTelemetry(initialTelemetry);
@@ -218,12 +345,23 @@ export function App() {
       source: 'SYSTEM',
     };
     setLogs([resetLog]);
+
+    if (backendConnected) {
+      apiClient.resetMission(activeMissionId, newSeed)
+        .then(() => syncFromBackend(activeMissionId))
+        .catch(() => {});
+    }
   };
 
   // Replay Demo Sequence
   const handleReplay = () => {
     handleReset(seed);
     setIsRunning(true);
+    if (backendConnected) {
+      apiClient.replayMission(activeMissionId)
+        .then(() => syncFromBackend(activeMissionId))
+        .catch(() => {});
+    }
   };
 
   // Execute Autonomous Mitigation Button
@@ -243,7 +381,7 @@ export function App() {
     };
     setLogs((prev) => [mitLog, ...prev]);
 
-    // Perform simulated mitigation state shifts
+    // Perform simulated mitigation state shifts locally
     if (hazard.hazardType === 'ROVER_STUCK' || hazard.hazardType === 'WHEEL_SLIP') {
       sim.setFaults({ roverStuck: false });
       sim.setOperationalMode('AUTONOMOUS_TRANSIT');
@@ -262,13 +400,24 @@ export function App() {
     }
 
     tickSimulation();
+
+    if (backendConnected) {
+      apiClient.executeMitigation(activeMissionId, hazard.hazardType)
+        .then(() => syncFromBackend(activeMissionId))
+        .catch(() => {});
+    }
   };
 
   // Toggle Rule Status in Matrix
   const handleToggleRule = (type: HazardType) => {
     const current = hazardEngineRef.current.getConfigs()[type];
-    hazardEngineRef.current.updateConfig(type, { enabled: !current.enabled });
+    const newEnabled = !current.enabled;
+    hazardEngineRef.current.updateConfig(type, { enabled: newEnabled });
     tickSimulation();
+
+    if (backendConnected) {
+      apiClient.updateHazardConfig(activeMissionId, type, { enabled: newEnabled }).catch(() => {});
+    }
   };
 
   const handleTabChange = (tab: 'DASHBOARD' | 'MAP' | 'TELEMETRY' | 'ASSISTANT' | 'LOGS') => {
@@ -292,6 +441,10 @@ export function App() {
         onOpenBenchmark={() => setIsBenchmarkOpen(true)}
         onOpenMatrix={() => setIsMatrixOpen(true)}
         seed={seed}
+        backendConnected={backendConnected}
+        activeMissionId={activeMissionId}
+        availableMissions={availableMissions}
+        onSelectMission={handleSelectMission}
       />
 
       {/* Main Mission Operations Center Content Area */}
@@ -311,7 +464,7 @@ export function App() {
               <div className="lg:col-span-7 h-[440px]">
                 <MissionMap
                   telemetry={telemetry}
-                  trail={simModelRef.current.getTrail()}
+                  trail={backendTrail.length > 0 ? backendTrail : simModelRef.current.getTrail()}
                   activeScenarioId={activeScenarioId}
                 />
               </div>
@@ -338,7 +491,7 @@ export function App() {
             {/* Scenario Simulator & Anomaly Injection Matrix */}
             <ScenarioController
               isRunning={isRunning}
-              onTogglePlay={() => setIsRunning(!isRunning)}
+              onTogglePlay={handleTogglePlay}
               onStep={tickSimulation}
               onReset={() => handleReset(seed)}
               onReplay={handleReplay}
@@ -357,13 +510,13 @@ export function App() {
             <div className="h-[640px]">
               <MissionMap
                 telemetry={telemetry}
-                trail={simModelRef.current.getTrail()}
+                trail={backendTrail.length > 0 ? backendTrail : simModelRef.current.getTrail()}
                 activeScenarioId={activeScenarioId}
               />
             </div>
             <ScenarioController
               isRunning={isRunning}
-              onTogglePlay={() => setIsRunning(!isRunning)}
+              onTogglePlay={handleTogglePlay}
               onStep={tickSimulation}
               onReset={() => handleReset(seed)}
               onReplay={handleReplay}
@@ -390,6 +543,7 @@ export function App() {
                 activeHazards={activeHazards}
                 risk={riskAssessment}
                 assistant={assistantRef.current}
+                activeMissionId={activeMissionId}
               />
             </div>
             <div className="lg:col-span-4 space-y-4">
@@ -425,7 +579,7 @@ export function App() {
               />
               <ScenarioController
                 isRunning={isRunning}
-                onTogglePlay={() => setIsRunning(!isRunning)}
+                onTogglePlay={handleTogglePlay}
                 onStep={tickSimulation}
                 onReset={() => handleReset(seed)}
                 onReplay={handleReplay}

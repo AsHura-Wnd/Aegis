@@ -150,4 +150,77 @@ describe('AEGIS Mission Control Dashboard Integration Tests', () => {
     });
     expect(screen.getByText(/AEGIS 9-VECTOR HAZARD DETECTION RULES MATRIX/i)).toBeDefined();
   });
+
+  it('exercises all six documented fault scenarios in the UI with correct state updates', () => {
+    render(<App />);
+
+    // 1. LOW_BATTERY
+    const battBtn = screen.getByText('Depleted Battery Emergency');
+    act(() => { fireEvent.click(battBtn); });
+    expect(screen.getAllByText(/LOW_BATTERY/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Low Battery Reserve/i).length).toBeGreaterThan(0);
+
+    // Clear
+    act(() => { fireEvent.click(screen.getByText('Clear All Faults / Recover')); });
+
+    // 2. ROVER_STUCK
+    const stuckBtn = screen.getByText('Loose Dune Sand Entrapment');
+    act(() => { fireEvent.click(stuckBtn); });
+    expect(screen.getAllByText(/ROVER_STUCK/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Locomotion Entrapment/i).length).toBeGreaterThan(0);
+
+    // Test mitigation button execution
+    const mitButtons = screen.getAllByText(/Execute Mitigation/i);
+    expect(mitButtons.length).toBeGreaterThan(0);
+    act(() => { fireEvent.click(mitButtons[0]); });
+
+    // 3. COMM_LOSS
+    const commBtn = screen.getByText('Orbiter Loss-of-Signal (LOS)');
+    act(() => { fireEvent.click(commBtn); });
+    expect(screen.getAllByText(/COMM_LOSS/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Weak Communication Link/i).length).toBeGreaterThan(0);
+    act(() => { fireEvent.click(screen.getByText('Clear All Faults / Recover')); });
+
+    // 4. EXTREME_TEMP
+    const tempBtn = screen.getByText('Drive Actuator Thermal Runaway');
+    act(() => { fireEvent.click(tempBtn); });
+    expect(screen.getAllByText(/EXTREME_TEMP/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Subsystem Thermal Overheating/i).length).toBeGreaterThan(0);
+    act(() => { fireEvent.click(screen.getByText('Clear All Faults / Recover')); });
+
+    // 5. SOLAR_DUST
+    const dustBtn = screen.getByText('Martian Dust Storm Deposition');
+    act(() => { fireEvent.click(dustBtn); });
+    expect(screen.getAllByText(/SOLAR_DUST/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Solar Panel Dust Deposition/i).length).toBeGreaterThan(0);
+    act(() => { fireEvent.click(screen.getByText('Clear All Faults / Recover')); });
+
+    // 6. HAZARDOUS_TERRAIN
+    const terrainBtn = screen.getByText('Belva Crater Scarp Incline');
+    act(() => { fireEvent.click(terrainBtn); });
+    expect(screen.getAllByText(/HAZARDOUS_TERRAIN/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Hazardous Terrain/i).length).toBeGreaterThan(0);
+    act(() => { fireEvent.click(screen.getByText('Clear All Faults / Recover')); });
+  });
+
+  it('tests reset, pause, resume, and mission controls', () => {
+    render(<App />);
+
+    // Pause
+    const pauseBtn = screen.getByRole('button', { name: /Pause/i });
+    expect(pauseBtn).toBeDefined();
+    act(() => { fireEvent.click(pauseBtn); });
+
+    // Resume / Play
+    const playBtn = screen.getByRole('button', { name: /Start/i });
+    expect(playBtn).toBeDefined();
+    act(() => { fireEvent.click(playBtn); });
+
+    // Reset
+    const resetBtn = screen.getByTitle(/Reset Simulation/i);
+    expect(resetBtn).toBeDefined();
+    act(() => { fireEvent.click(resetBtn); });
+
+    expect(screen.getByText(/All fault injectors disengaged/i)).toBeDefined();
+  });
 });

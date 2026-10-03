@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { soundFX } from '../utils/audio';
-import { BarChart3, CheckCircle2, Shield, TrendingUp, X, Zap } from 'lucide-react';
+import { BarChart3, CheckCircle2, Loader2, Play, Shield, TrendingUp, X, Zap } from 'lucide-react';
+import { apiClient } from '../services/apiClient';
 
 interface BaselineComparisonModalProps {
   isOpen: boolean;
@@ -11,7 +12,43 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
   isOpen,
   onClose,
 }) => {
+  const [benchmarkData, setBenchmarkData] = useState<any>(null);
+  const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && !benchmarkData) {
+      apiClient.getBenchmark()
+        .then((res) => {
+          if (res?.results) setBenchmarkData(res.results);
+        })
+        .catch(() => {});
+    }
+  }, [isOpen, benchmarkData]);
+
+  const handleRunLiveBenchmark = async () => {
+    setIsRunning(true);
+    soundFX.playClick();
+    try {
+      const res = await apiClient.runBenchmark(25, 60);
+      if (res?.results) {
+        setBenchmarkData(res.results);
+        soundFX.playSuccess();
+      }
+    } catch {
+      // Gracefully maintain existing
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   if (!isOpen) return null;
+
+  const survivalRate = benchmarkData?.aegis?.survivalRatePercent ?? 98.6;
+  const baselineSurvival = benchmarkData?.baselineTeleoperation?.survivalRatePercent ?? 64.2;
+  const resolutionSec = benchmarkData?.aegis?.averageIncidentResolutionSeconds ?? 1.2;
+  const powerSaved = benchmarkData?.improvementDeltas?.powerSavedPercent ?? 31.4;
+  const speedBoost = benchmarkData?.improvementDeltas?.traverseSpeedIncreasePercent ?? 166;
+  const missionCount = benchmarkData?.missionCount ?? 100;
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -23,48 +60,66 @@ export const BaselineComparisonModal: React.FC<BaselineComparisonModalProps> = (
               <BarChart3 className="w-5 h-5 text-cyan-400" />
             </div>
             <div>
-              <h2 className="text-sm font-space font-bold text-white tracking-wide">
-                AEGIS Autonomy vs Traditional Ground Teleoperation
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm font-space font-bold text-white tracking-wide">
+                  AEGIS Autonomy vs Traditional Ground Teleoperation
+                </h2>
+                {benchmarkData && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                    LIVE ENGINE
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-slate-400 font-space">
-                Headless benchmark analysis across 100 seeded simulated Mars traverse scenarios.
+                Headless benchmark analysis across {missionCount} seeded simulated Mars traverse scenarios.
               </p>
             </div>
           </div>
-          <button
-            onClick={() => {
-              soundFX.playClick();
-              onClose();
-            }}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRunLiveBenchmark}
+              disabled={isRunning}
+              className="px-2.5 py-1 text-xs font-mono rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 flex items-center gap-1.5 transition-all disabled:opacity-50"
+              title="Run Live Headless Benchmark on Backend (Port 3001)"
+            >
+              {isRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isRunning ? 'Simulating...' : 'Run Benchmark'}</span>
+            </button>
+            <button
+              onClick={() => {
+                soundFX.playClick();
+                onClose();
+              }}
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Highlight Comparison Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-emerald-500/30 text-center shadow-sm">
             <span className="text-[11px] font-space text-slate-400 font-semibold">Mission Survival</span>
-            <div className="text-2xl font-space font-bold text-emerald-400 mt-1">98.6%</div>
-            <span className="text-[10px] font-space text-slate-500">vs 64.2% teleoperation</span>
+            <div className="text-2xl font-space font-bold text-emerald-400 mt-1">{survivalRate}%</div>
+            <span className="text-[10px] font-space text-slate-500">vs {baselineSurvival}% teleoperation</span>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-cyan-500/30 text-center shadow-sm">
             <span className="text-[11px] font-space text-slate-400 font-semibold">Response Latency</span>
-            <div className="text-2xl font-space font-bold text-cyan-400 mt-1">1.2 sec</div>
+            <div className="text-2xl font-space font-bold text-cyan-400 mt-1">{resolutionSec}s</div>
             <span className="text-[10px] font-space text-slate-500">vs 42.5 min roundtrip</span>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-yellow-500/30 text-center shadow-sm">
             <span className="text-[11px] font-space text-slate-400 font-semibold">Power Conserved</span>
-            <div className="text-2xl font-space font-bold text-yellow-400 mt-1">+31.4%</div>
+            <div className="text-2xl font-space font-bold text-yellow-400 mt-1">+{powerSaved}%</div>
             <span className="text-[10px] font-space text-slate-500">lower stall waste</span>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[#0a0f1d] border border-purple-500/30 text-center shadow-sm">
             <span className="text-[11px] font-space text-slate-400 font-semibold">Traverse Velocity</span>
-            <div className="text-2xl font-space font-bold text-purple-400 mt-1">+166%</div>
+            <div className="text-2xl font-space font-bold text-purple-400 mt-1">+{speedBoost}%</div>
             <span className="text-[10px] font-space text-slate-500">continuous autonomy</span>
           </div>
         </div>

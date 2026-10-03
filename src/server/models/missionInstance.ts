@@ -93,10 +93,11 @@ export class MissionInstance {
     };
   }
 
-  public getTelemetry(): { current: RoverTelemetry; history: TelemetryHistoryPoint[] } {
+  public getTelemetry(): { current: RoverTelemetry; history: TelemetryHistoryPoint[]; trail: { x: number; y: number; tick: number }[] } {
     return {
       current: this.latestTelemetry,
       history: [...this.telemetryHistory],
+      trail: this.simModel.getTrail(),
     };
   }
 

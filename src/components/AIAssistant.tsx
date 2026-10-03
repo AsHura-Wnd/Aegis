@@ -17,11 +17,14 @@ import {
   User,
 } from 'lucide-react';
 
+import { apiClient } from '../services/apiClient';
+
 interface AIAssistantProps {
   telemetry: RoverTelemetry;
   activeHazards: DetectedHazard[];
   risk: RiskAssessment;
   assistant: AegisAIAssistant;
+  activeMissionId?: string;
 }
 
 const QUICK_PROMPTS: QuickPrompt[] = [
@@ -37,6 +40,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   activeHazards,
   risk,
   assistant,
+  activeMissionId = 'primary-mission',
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -77,14 +81,27 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await assistant.respondToQuery(q, {
-        telemetry,
-        activeHazards,
-        risk,
-        missionName: 'Jezero Delta Traverse',
-      });
+      let response: ChatMessage | null = null;
+      try {
+        const backendRes = await apiClient.askAssistant(activeMissionId, q);
+        if (backendRes && backendRes.response) {
+          response = backendRes.response;
+        }
+      } catch {
+        // Fall back to local assistant engine if backend unavailable
+      }
+
+      if (!response) {
+        response = await assistant.respondToQuery(q, {
+          telemetry,
+          activeHazards,
+          risk,
+          missionName: 'Jezero Delta Traverse',
+        });
+      }
+
       soundFX.playSuccess();
-      setMessages((prev) => [...prev, response]);
+      setMessages((prev) => [...prev, response!]);
     } catch (err) {
       console.error('Failed to get response', err);
     } finally {
