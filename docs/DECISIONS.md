@@ -1,6 +1,6 @@
 # AEGIS — Architectural Decision Records (ADRs)
 
-This document records the foundational architectural decisions implemented in the AEGIS codebase. Rationale is drawn directly from code evidence and test verifications.
+This document records the foundational architectural decisions implemented in the AEGIS codebase. Only decisions directly supported by code, commit history, and runtime evidence are recorded. Where past design alternatives or historical discussions were not formally archived in the repository, they are marked as **`Undocumented decision — rationale to be confirmed`**.
 
 ---
 
@@ -21,104 +21,103 @@ This document records the foundational architectural decisions implemented in th
 
 ## ADR-001: Standalone Node.js + Express Backend Architecture
 
-- **Context**: The hackathon prototype originally ran simulation, hazard detection, and risk scoring logic directly in React component state on the client side. This prevented headless testing, background simulation, multi-client monitoring, and automated benchmarking.
-- **Decision**: Extract simulation physics, hazard engines, and risk scoring into an independent Node.js + Express + TypeScript service exposing standard REST endpoints.
-- **Alternatives Considered**: Keeping simulation in React state (rejected due to lack of headless benchmarking and API accessibility); Web Workers (rejected because external REST clients and automated test scripts could not query the rover state).
+- **Context**: The mission simulation, hazard detection, and risk scoring logic needed to run independently of the browser DOM and React lifecycle to support headless execution, automated testing, and external API queries.
+- **Decision**: Implement an independent Node.js + Express + TypeScript service in [`src/server/`](file:///d:/Projects/Aegis/src/server/) exposing standard REST endpoints.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Decoupling the backend enables CLI-based testing via Vitest and Supertest without requiring a browser instance, and permits headless benchmark execution.
 - **Consequences**:
   - Positive: Backend can run headlessly (`npm run server`) on port 3001 without frontend running.
-  - Positive: Automated test suites (`vitest`, `supertest`) can verify APIs without browser rendering.
-  - Negative: Requires cross-origin resource sharing (CORS) configuration and network communication between frontend and backend.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Automated test suites can verify API behavior programmatically.
+  - Negative: Requires CORS configuration and asynchronous network fetching between frontend and backend.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-002: In-Memory Mission Instance State Isolation
 
-- **Context**: The backend needed to support multiple simultaneous missions (e.g. concurrent testing, benchmark runs, multi-rover exploration) without state leakage.
-- **Decision**: Implement a `MissionService` singleton maintaining a `Map<string, MissionInstance>`. Each `MissionInstance` owns private instances of `RoverSimulationModel`, `HazardDetectionEngine`, `DynamicRiskEngine`, and `AutonomousDecisionEngine`.
-- **Alternatives Considered**: Global single-mission state (rejected due to inability to run concurrent isolation tests or parallel benchmarks); relational database persistence (deferred to Phase 4 for simplicity during hackathon development).
+- **Context**: The system must support creating, stepping, resetting, and deleting multiple rover missions without state leakage or shared timer collisions.
+- **Decision**: Implement `MissionService` maintaining a `Map<string, MissionInstance>`. Each `MissionInstance` encapsulates its own simulation model, hazard engine, risk engine, and background timer handle.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: An in-memory map provides zero-latency state access and clean encapsulation without introducing database setup overhead during rapid hackathon iteration.
 - **Consequences**:
-  - Positive: Strict isolation between missions (verified via `testAudit.mjs`).
-  - Positive: Instantaneous in-memory state mutations without disk I/O latency.
-  - Negative: Mission state is ephemeral and resets if the backend process restarts.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Complete isolation between concurrent missions (verified via [`scripts/testAudit.mjs`](file:///d:/Projects/Aegis/scripts/testAudit.mjs)).
+  - Negative: Ephemeral storage; server restarts re-initialize the mission catalog to default state.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-003: Deterministic Linear Congruential PRNG for Simulation
 
-- **Context**: Planetary mission simulation requires repeatable, reproducible test scenarios to validate autonomous decision algorithms. Standard `Math.random()` produces non-reproducible sequences.
-- **Decision**: Implement a custom `SeededRandom` class using a Linear Congruential Generator ($X_{n+1} = (aX_n + c) \pmod m$) to drive all stochastic terrain roughness, slip noise, and atmospheric temperature flux.
-- **Alternatives Considered**: Native `Math.random()` (rejected due to non-determinism); external PRNG library (rejected to minimize external dependencies).
+- **Context**: Mission replay and hazard validation require identical, reproducible physical state trajectories when supplied with the same numerical seed.
+- **Decision**: Implement a custom `SeededRandom` linear congruential generator in [`src/simulation/roverModel.ts`](file:///d:/Projects/Aegis/src/simulation/roverModel.ts) ($X_{n+1} = (1664525 \cdot X_n + 1013904223) \bmod 2^{32}$) to govern all stochastic variables (terrain noise, wheel slip fluctuations, sensor jitter).
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Native `Math.random()` cannot be seeded in standard V8 JavaScript, precluding reproducible replay.
 - **Consequences**:
-  - Positive: 100% bit-accurate replay across runs with identical seeds.
-  - Positive: Zero external npm dependencies.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Bit-accurate state reproducibility across repeated runs with the same seed.
+  - Positive: Zero external library dependencies.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-004: Additive Point System with Compounding Hazard Multipliers
 
-- **Context**: Autonomous risk scoring in planetary robotics cannot rely on simple linear averaging. Independent minor hazards can combine synergistically to create vehicle-loss conditions (e.g. Low Battery alone is manageable; Low Battery combined with Communication Loss is catastrophic).
-- **Decision**: Implement a two-tiered calculation in `DynamicRiskEngine`:
-  1. Base environmental risk + additive points by severity (`CRITICAL`: 78 pts, `HIGH`: 46 pts, `MODERATE`: 24 pts).
-  2. Explicit compounding multipliers for 5 recognized dangerous interactions (+25% to +40%).
-  3. Absolute severity floors (e.g. any `CRITICAL` hazard forces minimum score of 78).
-- **Alternatives Considered**: Weighted average formula (rejected because critical single faults could be masked by other healthy subsystems); machine learning risk classifier (rejected due to lack of explainability and training datasets).
+- **Context**: Autonomous risk scoring in planetary robotics requires accounting for multi-subsystem degradation where independent non-critical faults combine to threaten mission survival.
+- **Decision**: Implement an additive severity point model (`LOW`: 12, `MODERATE`: 24, `HIGH`: 46, `CRITICAL`: 78) augmented by 5 compounding multipliers (+25% to +40%) for specific hazard pairings (e.g. Low Battery + Comm Loss).
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: A purely linear average would allow a critical failure to be masked by normal readings in unrelated subsystems. The additive-with-compounding model guarantees appropriate escalation.
 - **Consequences**:
-  - Positive: Transparent, explainable risk escalation with explicit `compoundingFactors` logs.
-  - Positive: Deterministic and verifiable through unit tests.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Transparent, explainable risk escalation with explicit `compoundingFactors` logging.
+  - Positive: Deterministic scoring easily tested via unit tests.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-005: Headless Batch Monte Carlo Benchmark Service
 
-- **Context**: Hackathon demonstrations require quantitative, reproducible proof that autonomous edge decision-making outperforms traditional Earth teleoperation.
-- **Decision**: Implement `HeadlessBenchmarkEngine` in [`src/server/services/benchmarkService.ts`](file:///d:/Projects/Aegis/src/server/services/benchmarkService.ts) to execute $N$ missions across varying seeds headlessly, dynamically aggregating speed, power, survival rate, and incident resolution times.
-- **Alternatives Considered**: Hardcoded benchmark comparison charts (rejected as unverified claims); real-time UI-driven benchmark (rejected due to multi-minute execution times).
+- **Context**: Validating edge autonomy benefits over Earth teleoperation requires empirical comparison across varied mission seeds and fault injections.
+- **Decision**: Implement [`HeadlessBenchmarkEngine`](file:///d:/Projects/Aegis/src/server/services/benchmarkService.ts) to execute batch simulations of $N$ missions headlessly, aggregating survival rates, resolution times, traverse speeds, and power usage.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Running benchmarks in real-time UI would require minutes of rendering; running headlessly allows evaluating hundreds of ticks in milliseconds.
 - **Consequences**:
-  - Positive: Real dynamic calculations running 1,000+ simulation ticks in under 300ms.
-  - Positive: Verifiable through automated test scripts (`backend.test.ts`, `testAudit.mjs`).
-- **Status**: `Accepted & Implemented`.
+  - Positive: Dynamic benchmark calculations from real simulated ticks rather than static mock tables.
+  - Negative: Baseline teleoperation characteristics (e.g. 2,550s Earth round-trip delay, 35% stall failure probability) are modeled assumptions rather than live hardware telemetry.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-006: Dual-Engine AI Assistant (Deterministic Fallback + Optional LLM)
 
-- **Context**: Planetary missions operate in deep-space environments where cloud LLM APIs are unreachable due to light-delay or communication loss. Furthermore, hackathon environments may lack active API keys.
-- **Decision**: Implement a two-tier architecture in `AegisAIAssistant`:
-  1. Offline Deterministic Rules Engine: Analyzes query intent and generates context-grounded markdown responses directly from live telemetry.
-  2. Cloud Hybrid Mode: When `GEMINI_API_KEY` is provided, queries the Gemini API with automatic, silent fallback to the deterministic engine upon network error or timeout.
-- **Alternatives Considered**: Pure cloud LLM (rejected due to comms loss constraint and dependency on API keys); pure rule engine without LLM capability (rejected to allow natural language flexibility).
+- **Context**: The mission assistant must operate reliably in offline and local environments where internet access or external API credentials may not be available.
+- **Decision**: Implement a two-tier architecture in [`AegisAIAssistant`](file:///d:/Projects/Aegis/src/engines/aiAssistantEngine.ts): an offline deterministic rule engine grounded in live telemetry, with an optional hybrid Gemini LLM mode when an API key is provided.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Guarantees zero-configuration reliability while preserving the option for natural language generation when credentials exist.
 - **Consequences**:
-  - Positive: Assistant is 100% functional out of the box with zero configuration.
-  - Positive: Complete resilience to network failures.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Fully functional offline with zero setup.
+  - Positive: Seamless fallback upon LLM network failure or timeout.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-007: Bounded Ring Buffers for Telemetry and Event Streams
 
-- **Context**: Long-running simulations with high tick rates can exhaust Node.js heap memory if arrays append indefinitely.
-- **Decision**: Enforce explicit FIFO limits on all historical data structures:
-  - `telemetryHistory`: Capped at 100 points via `.shift()`.
-  - `logs`: Capped at 300 entries via `.slice(0, 300)`.
-  - `trail`: Capped at 300 coordinates via `.shift()`.
-- **Alternatives Considered**: Unbounded arrays (rejected due to memory leak risk); disk-backed circular logs (deferred to future persistence phase).
+- **Context**: Long-running simulations with continuous ticking risk unbounded memory growth if history arrays grow indefinitely.
+- **Decision**: Implement FIFO trimming on in-memory collections: `telemetryHistory` capped at 100 points, `logs` capped at 300 entries, `trail` capped at 300 coordinates.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Prevents memory leaks and maintains stable memory usage during extended simulation sessions.
 - **Consequences**:
-  - Positive: Flat, predictable memory footprint even under continuous multi-hour runs.
-  - Negative: Telemetry older than 100 ticks is discarded from the active API response.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Stable heap memory usage over multi-hour runs.
+  - Negative: Telemetry older than 100 ticks is pruned from the active REST response.
+- **Current Status**: `Accepted & Implemented`.
 
 ---
 
 ## ADR-008: Subsystem Telemetry Normalization on Fault Clearance
 
-- **Context**: When an operator cleared an active fault scenario (e.g. `LOW_BATTERY`), the fault flag was reset, but degraded telemetry variables (e.g. battery at 18.5%) lingered, contaminating subsequent tests.
-- **Decision**: Update `RoverSimulationModel.clearFaults()` to restore nominal subsystem baselines (`batteryPct = 85.0%`, `motorTempC = 28.2°C`, `dustPct = 12.0%`) and transition operational mode back to `AUTONOMOUS_TRANSIT`.
-- **Alternatives Considered**: Requiring a full mission reset (rejected because operators need to demonstrate fault recovery mid-traverse without losing mission progress).
+- **Context**: Clearing an active fault scenario previously reset the scenario ID but left physical telemetry variables degraded (e.g. battery at 18.5%, motor temp at 74°C), contaminating subsequent tests.
+- **Decision**: Update `RoverSimulationModel.clearFaults()` to restore nominal subsystem values (`batteryPct = 85.0%`, `motorTempC = 28.2°C`, `dustPct = 12.0%`) and transition operational mode back to `AUTONOMOUS_TRANSIT`.
+- **Alternatives Considered**: `Undocumented decision — rationale to be confirmed`.
+- **Reasoning**: Ensures that operator-directed fault clears return the rover to a clean, healthy baseline without requiring a complete mission reset.
 - **Consequences**:
-  - Positive: Clean isolation between sequential scenario demonstrations.
-  - Positive: Immediate visual and telemetry recovery in dashboard HUD.
-- **Status**: `Accepted & Implemented`.
+  - Positive: Clean state isolation between sequential scenario demonstrations.
+  - Positive: Verified across live HTTP audit scripts.
+- **Current Status**: `Accepted & Implemented`.

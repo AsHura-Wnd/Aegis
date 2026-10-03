@@ -11,8 +11,8 @@ This document specifies the operational fault scenarios implemented in the AEGIS
 | **`LOW_BATTERY`** | Depleted Battery Emergency | Low Battery Reserve | `batteryPct <= 18.5%` | **HIGH / CRITICAL** | `RECHARGE_STANDBY` |
 | **`ROVER_STUCK`** | Loose Dune Sand Entrapment | Locomotion Entrapment | `roverStuck: true` | **CRITICAL (100/100)**| `EMERGENCY_RECOVERY` |
 | **`COMM_LOSS`** | Orbiter Loss-of-Signal | Weak Communication Link | `commLoss: true` | **CRITICAL (83/100)** | `SAFE_HOLD` |
-| **`EXTREME_TEMP`**| Drive Actuator Runaway | Subsystem Thermal Overheat | `motorTempC >= 70°C` | **CRITICAL (83/100)** | `SAFE_HOLD` / Louvers |
-| **`SOLAR_DUST`** | Dust Storm Deposition | Solar Panel Dust Deposition | `dustPct >= 78%` | **HIGH (52/100)** | Gimbal Realignment |
+| **`EXTREME_TEMP`**| Drive Actuator Runaway | Subsystem Thermal Overheat | `motorTempC >= 70°C` | **CRITICAL (83/100)** | Radiators Deployed (`AUTONOMOUS_TRANSIT`) |
+| **`SOLAR_DUST`** | Dust Storm Deposition | Solar Panel Dust Deposition | `dustPct >= 78%` | **HIGH (52/100)** | Gimbal Realignment (`AUTONOMOUS_TRANSIT`) |
 | **`HAZARDOUS_TERRAIN`**| Belva Crater Scarp Incline| Hazardous Terrain | `slope >= 27.8°` | **CRITICAL (100/100)**| `HAZARD_AVOIDANCE` |
 
 ---

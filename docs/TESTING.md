@@ -145,18 +145,18 @@ Tests full user interface and user interaction flows:
 
 | Requirement ID | System Requirement | Primary Test File | Specific Test Case | Verified |
 | :--- | :--- | :--- | :--- | :---: |
-| **REQ-TEL-01** | Deterministic Seeded Physics | `aegis.test.ts` | `generates identical telemetry across same seeds` | ✅ |
-| **REQ-TEL-02** | Bounded History Ring Buffer | `backend.test.ts` | `clamps history length to maximum buffer` | ✅ |
-| **REQ-HAZ-01** | Low Battery Detection | `aegis.test.ts` | `triggers LOW_BATTERY below threshold` | ✅ |
-| **REQ-HAZ-02** | Subsystem Overheat Detection | `aegis.test.ts` | `triggers OVERHEATING above 50°C and 68°C` | ✅ |
-| **REQ-HAZ-04** | Wheel Slip & Entrapment | `aegis.test.ts` | `triggers ROVER_STUCK upon 3 stall ticks` | ✅ |
-| **REQ-RSK-01** | Compounding Risk Multipliers | `aegis.test.ts` | `applies compounding factor for Low Battery + Comm Loss`| ✅ |
-| **REQ-MOD-01** | Mode Shift to Emergency Recovery | `aegis.test.ts` | `shifts to EMERGENCY_RECOVERY when rover stuck` | ✅ |
-| **REQ-MOD-02** | Mode Shift to Safe Hold | `aegis.test.ts` | `shifts to SAFE_HOLD during comm blackout` | ✅ |
-| **REQ-REC-01** | Rocker-Bogie Extraction | `backend.test.ts` | `POST /mitigate extricates trapped drive wheels` | ✅ |
-| **REQ-ISO-01** | Multi-Mission State Quarantine | `testAudit.mjs` | `concurrent missions exhibit zero cross-leakage` | ✅ |
-| **REQ-BNK-01** | Dynamic Headless Benchmark | `backend.test.ts` | `POST /benchmark computes metrics from simulated ticks` | ✅ |
-| **REQ-API-01** | Standard Error Schemas & Codes | `backend.test.ts` | `returns 400 on invalid input, 404 on missing mission` | ✅ |
+| **REQ-TEL-01** | Deterministic Seeded Physics | `aegis.test.ts` | `produces identical deterministic telemetry runs with the same seed` | ✅ |
+| **REQ-TEL-02** | Telemetry Stepping & History Ring Buffer | `backend.test.ts` | `POST /api/missions/:id/step advances ticks and updates telemetry and risk` | ✅ |
+| **REQ-HAZ-01** | Low Battery Detection | `aegis.test.ts` | `detects Hazard 1: LOW_BATTERY` | ✅ |
+| **REQ-HAZ-02** | Subsystem Overheat Detection | `aegis.test.ts` | `detects Hazard 2: OVERHEATING` | ✅ |
+| **REQ-HAZ-04** | Wheel Slip & Entrapment | `aegis.test.ts` | `detects Hazard 5: ROVER_STUCK` | ✅ |
+| **REQ-RSK-01** | Compounding Risk Multipliers | `aegis.test.ts` | `applies compounding multiplier when Low Battery + Comm Loss coincide` | ✅ |
+| **REQ-MOD-01** | Mode Shift to Emergency Recovery | `aegis.test.ts` | `switches to EMERGENCY_RECOVERY when ROVER_STUCK hazard triggers` | ✅ |
+| **REQ-MOD-02** | Mode Shift to Safe Hold | `aegis.test.ts` | `switches to SAFE_HOLD during critical comms loss` | ✅ |
+| **REQ-REC-01** | Rocker-Bogie Extraction Pipeline | `backend.test.ts` | `executes the full scenario-to-decision pipeline for ROVER_STUCK` | ✅ |
+| **REQ-ISO-01** | Multi-Mission State Quarantine | `testAudit.mjs` | `AUDITING MISSION ISOLATION (Alpha vs Beta)` | ✅ |
+| **REQ-BNK-01** | Dynamic Headless Benchmark | `backend.test.ts` | `POST /api/benchmark executes headless benchmark comparing AEGIS vs teleoperation` | ✅ |
+| **REQ-API-01** | Multi-Mission REST API Lifecycle | `backend.test.ts` | `supports creating, listing, retrieving, and isolating multiple missions` | ✅ |
 
 ---
 

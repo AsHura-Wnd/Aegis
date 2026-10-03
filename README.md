@@ -16,7 +16,7 @@ During planetary exploration on Mars, radio frequency communications between the
 
 ## 🚀 Key System Features
 
-1. **Standalone Node.js + Express REST Architecture**: Decoupled backend service running independently of browser rendering, exposing 21 validated REST endpoints.
+1. **Standalone Node.js + Express REST Architecture**: Decoupled backend service running independently of browser rendering, exposing 22 validated REST endpoints.
 2. **Deterministic Seeded Kinematics**: PRNG-driven 6-wheel rocker-bogie simulation guaranteeing 100% bit-accurate state replay across identical seeds.
 3. **9-Vector Real-Time Hazard Engine**: Continuous automated detection across Power, Thermal, Mobility, Communications, and Terrain.
 4. **Dynamic Compounding Risk Engine**: 0–100 composite risk scoring with explicit change reasoning and 5 multi-fault interaction multipliers (+25% to +40%).
@@ -208,7 +208,8 @@ All mission endpoints support multi-mission routing using `:id` (e.g. `primary-m
 | `POST` | `/api/missions/:id/assistant` | Query context-aware AI mission assistant |
 | `POST` | `/api/missions/:id/reset` | Reset mission to start coordinates (`MET 00:00:00`) |
 | `POST` | `/api/missions/:id/replay` | Reset and replay mission with initial seed |
-| `POST` | `/api/benchmark` | Run headless Monte Carlo benchmark across N missions |
+| `GET` | `/api/benchmark` | Get baseline headless benchmark results (20 missions) |
+| `POST` | `/api/benchmark` | Run parameterized headless Monte Carlo benchmark across N missions |
 
 ---
 

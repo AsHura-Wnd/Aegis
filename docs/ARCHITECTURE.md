@@ -143,15 +143,13 @@ stateDiagram-v2
     RECHARGE_STANDBY --> AUTONOMOUS_TRANSIT: Solar charge recovered > 70% / Fault cleared
     SAFE_HOLD --> AUTONOMOUS_TRANSIT: Telemetry link restored / Autonomous override cleared
     HAZARD_AVOIDANCE --> AUTONOMOUS_TRANSIT: Obstacle circumnavigated / Regolith slope nominal
-
-    EMERGENCY_RECOVERY --> SAFE_HOLD: Motor Temp > 72°C during extrication
 ```
 
 | Mode | Trigger Conditions | Automated Actions |
 | :--- | :--- | :--- |
 | **`AUTONOMOUS_TRANSIT`** | All 9 hazard vectors nominal; regolith slope `< 18°`. | Standard waypoint navigation (speed: 0.12–0.18 m/s, forward heading locked). |
 | **`EMERGENCY_RECOVERY`** | `ROVER_STUCK` (0 m/s for 3 ticks with stall amps > 9.5A). | Locks steering, activates rocker-bogie peristaltic crab-walk, reverses wheel torque. |
-| **`SAFE_HOLD`** | `COMM_LOSS` (`< -108 dBm`), actuator overheat (`> 68°C`), or unresolvable fault. | Halts locomotion, buffers telemetry to flash RAM, enters low-power safeguard. |
+| **`SAFE_HOLD`** | `COMM_LOSS` (`< -108 dBm`). | Halts locomotion, buffers telemetry to flash RAM, enters low-power safeguard. |
 | **`HAZARD_AVOIDANCE`** | `DANGEROUS_TERRAIN` (slope `> 24°`), `WHEEL_SLIP > 0.60`. | Throttles speed by 50%, brakes, samples local DEM mesh, generates detour spline. |
 | **`RECHARGE_STANDBY`** | `LOW_BATTERY` (`< 15%`), photovoltaic dust deposition (`> 75%`). | Suspends science payloads, halts night transit, diverts to Solis Plateau Solar Haven. |
 

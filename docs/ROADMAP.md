@@ -148,9 +148,9 @@ gantt
 #### 2.3 Energy- & Risk-Aware Path Planning (Detour Routing & Solar Havens)
 - **Status**: `Completed`
 - **Priority**: `P1`
-- **Expected Outcome**: Route recalculation around hazardous craters/dunes, nearest recharge plateau lookup (`findNearestRechargeZone`).
+- **Expected Outcome**: Trajectory diversion around hazardous craters/dunes via 50% transit velocity throttling, and nearest recharge plateau lookup (`findNearestRechargeZone`). *(Note: Global arbitrary A* 3D DEM mesh replanning across unmapped terrain is a future Phase 4 enhancement).*
 - **Dependencies**: Phase 1
-- **Acceptance Criteria**: Low-battery states trigger reroute toward Solis Plateau Solar Haven; dangerous terrain triggers contour-following detour.
+- **Acceptance Criteria**: Low-battery states trigger diversion toward Solis Plateau Solar Haven; dangerous terrain triggers contour-following transit offset.
 - **Relevant Files**: [`src/simulation/terrainMap.ts`](file:///d:/Projects/Aegis/src/simulation/terrainMap.ts), [`src/engines/decisionEngine.ts`](file:///d:/Projects/Aegis/src/engines/decisionEngine.ts)
 
 ---
@@ -186,8 +186,8 @@ gantt
 - **Priority**: `P0`
 - **Expected Outcome**: Full REST API covering health, missions, simulation stepping, ticking controls, telemetry, hazards, risk, decisions, mitigations, and assistant.
 - **Dependencies**: Phase 1, 2, 3
-- **Acceptance Criteria**: 21 verified endpoints returning standardized JSON with strict status codes (200, 201, 400, 404, 500).
-- **Relevant Files**: [`src/server/routes/missionRoutes.ts`](file:///d:/Projects/Aegis/src/server/routes/missionRoutes.ts)
+- **Acceptance Criteria**: 22 verified endpoints returning standardized JSON with strict status codes (200, 201, 400, 404, 500).
+- **Relevant Files**: [`src/server/routes/missionRoutes.ts`](file:///d:/Projects/Aegis/src/server/routes/missionRoutes.ts), [`src/server/routes/benchmarkRoutes.ts`](file:///d:/Projects/Aegis/src/server/routes/benchmarkRoutes.ts)
 
 #### 4.2 Context-Aware AI Mission Assistant
 - **Status**: `Completed`

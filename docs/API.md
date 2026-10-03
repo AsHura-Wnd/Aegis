@@ -485,8 +485,48 @@ Queries the context-aware mission assistant grounded in live telemetry.
 
 ## 7. Headless Benchmark Engine
 
+### `GET /api/benchmark`
+Runs and retrieves default baseline benchmark metrics (20 missions, 25 ticks/mission).
+
+- **Request**: No parameters.
+- **Response** (`200 OK`):
+  ```json
+  {
+    "results": {
+      "missionCount": 20,
+      "totalTicksSimulated": 500,
+      "aegis": {
+        "survivalRatePercent": 100.0,
+        "averageIncidentResolutionSeconds": 1.8,
+        "averageTraverseSpeedMps": 0.150,
+        "averagePowerConsumedWatts": 196.4,
+        "batteryRemainingAveragePercent": 87.2,
+        "totalHazardsEncountered": 20,
+        "totalHazardsMitigatedAutonomously": 20,
+        "rolloversAvoided": 8
+      },
+      "baselineTeleoperation": {
+        "survivalRatePercent": 90.0,
+        "averageIncidentResolutionSeconds": 2550,
+        "averageTraverseSpeedMps": 0.040,
+        "averagePowerConsumedWatts": 234.8,
+        "batteryRemainingAveragePercent": 59.2,
+        "totalHazardsEncountered": 20,
+        "totalGroundHaltCycles": 280,
+        "rolloversOrStallFailures": 2
+      },
+      "improvementDeltas": {
+        "survivalRateBoostPercent": 10.0,
+        "resolutionSpeedupFactor": 1417,
+        "traverseSpeedIncreasePercent": 275.0,
+        "powerSavedPercent": 16.4
+      }
+    }
+  }
+  ```
+
 ### `POST /api/benchmark`
-Runs an automated batch Monte Carlo simulation comparing AEGIS edge autonomy against Earth teleoperation.
+Runs an automated batch Monte Carlo simulation comparing AEGIS edge autonomy against Earth teleoperation across parameterized missions.
 
 - **Request Body** (optional):
   ```json
