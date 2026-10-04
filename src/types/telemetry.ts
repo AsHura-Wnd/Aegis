@@ -71,12 +71,19 @@ export interface RoverTelemetry {
   roughnessIndex: number; // 0.0 to 1.0
   currentTerrain: TerrainType;
   
-  // Mission Progress
+  // Mission Progress & Source
   distanceTraveledMeters: number;
   distanceToTargetMeters: number;
   progressPercent: number;
   currentObjective: string;
   operationalMode: OperationalMode;
+
+  // Data Source & Hardware Identification
+  telemetrySource?: 'SIMULATION' | 'HARDWARE';
+  roverId?: string;
+  sequenceNumber?: number;
+  forwardDistanceCm?: number;
+  lastHardwareContact?: number;
 }
 
 export interface TelemetryHistoryPoint {

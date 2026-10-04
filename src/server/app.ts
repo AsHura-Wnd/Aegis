@@ -2,16 +2,39 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { missionRouter } from './routes/missionRoutes';
 import { benchmarkRouter } from './routes/benchmarkRoutes';
+import { telemetryRouter, deviceRouter } from './routes/ingestionRoutes';
 import { missionService } from './services/missionService';
 
 export const app = express();
 
-// Middleware
-app.use(cors({
-  origin: '*',
+// CORS Configuration: Restrict browser origins in production while allowing non-browser clients (microcontrollers/curl)
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Requests with no origin (e.g. mobile apps, curl, ESP32 microcontrollers) are allowed
+    if (!origin) return callback(null, true);
+
+    if (process.env.NODE_ENV === 'production') {
+      const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim())
+        : [
+            process.env.FRONTEND_URL || 'https://aegis-mission-control.vercel.app',
+            'https://aegis-rover.vercel.app',
+          ];
+
+      if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    } else {
+      callback(null, true);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Device-Token'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
@@ -38,6 +61,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // API Routes
 app.use('/api/missions', missionRouter);
 app.use('/api/benchmark', benchmarkRouter);
+app.use('/api/telemetry', telemetryRouter);
+app.use('/api/devices', deviceRouter);
 
 // 404 Handler
 app.use((_req: Request, res: Response) => {
@@ -64,6 +89,10 @@ app.use((_req: Request, res: Response) => {
       'POST /api/missions/:id/reset',
       'POST /api/missions/:id/replay',
       'POST /api/benchmark',
+      'POST /api/telemetry/ingest',
+      'GET /api/devices',
+      'GET /api/devices/:roverId',
+      'POST /api/devices/:roverId/reset',
     ],
   });
 });

@@ -187,6 +187,33 @@ export const Header: React.FC<HeaderProps> = ({
               <span>{backendConnected ? 'API 3001: ONLINE' : 'API: LOCAL'}</span>
             </span>
 
+            {/* Hardware vs Simulation Source Indicator */}
+            <span
+              className={`text-xs font-mono px-3 py-1 rounded-full border flex items-center gap-1.5 font-medium ${
+                telemetry.telemetrySource === 'HARDWARE'
+                  ? 'bg-cyan-950/50 text-cyan-300 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.25)]'
+                  : 'bg-zinc-900/60 text-zinc-400 border-white/10'
+              }`}
+              title={
+                telemetry.telemetrySource === 'HARDWARE'
+                  ? `Physical Hardware Rover (${telemetry.roverId || 'RC-Rover'}) | Pkt #${telemetry.sequenceNumber ?? 0}`
+                  : 'Synthetic Mars Rover Simulation Model'
+              }
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  telemetry.telemetrySource === 'HARDWARE'
+                    ? 'bg-cyan-400 animate-pulse'
+                    : 'bg-zinc-500'
+                }`}
+              />
+              <span>
+                {telemetry.telemetrySource === 'HARDWARE'
+                  ? `HW: ${telemetry.roverId || 'ROVER'} (PKT #${telemetry.sequenceNumber ?? 0})`
+                  : 'SOURCE: SIMULATION'}
+              </span>
+            </span>
+
             {/* Active Mission Switcher */}
             {availableMissions.length > 0 && onSelectMission && (
               <div className="flex items-center gap-1.5">
