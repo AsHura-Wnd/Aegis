@@ -26,7 +26,27 @@ export interface BackendHealth {
   activeMissionsCount: number;
 }
 
-const API_BASE = '/api';
+/**
+ * Resolves the backend API base URL:
+ * - Production: uses VITE_API_URL if configured, falling back to live Render backend: https://aegis-92x3.onrender.com/api
+ * - Local development: uses relative '/api' proxied by Vite dev server to localhost:3001
+ */
+export function getApiBaseUrl(): string {
+  const envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+
+  // When built and running in production (e.g. deployed to Vercel), route directly to Render backend
+  if ((import.meta as any).env?.PROD) {
+    return 'https://aegis-92x3.onrender.com/api';
+  }
+
+  // Local development / fallback proxy
+  return '/api';
+}
+
+const API_BASE = getApiBaseUrl();
 
 export const apiClient = {
   async checkHealth(): Promise<BackendHealth | null> {
@@ -206,5 +226,27 @@ export const apiClient = {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
+  },
+
+  async listDevices(): Promise<any[]> {
+    try {
+      const res = await fetch(`${API_BASE}/devices`, { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.devices || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async getDevice(roverId: string): Promise<any | null> {
+    try {
+      const res = await fetch(`${API_BASE}/devices/${encodeURIComponent(roverId)}`, { signal: AbortSignal.timeout(3000) });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.device || null;
+    } catch {
+      return null;
+    }
   },
 };
